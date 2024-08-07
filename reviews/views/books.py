@@ -3,7 +3,7 @@ from decouple import config
 from bson.objectid import ObjectId
 import pymongo
 from reviews.types import Book
-from reviews.utils import get_all, get_related_reviews, get_related_sales
+from reviews.utils import get_all, get_reviews_by_book, get_sales_by_book
 
 # MongoDB connection
 client = pymongo.MongoClient(config('MONGODB_URI'))
@@ -27,8 +27,8 @@ def book_list(request):
 def book_detail(request, pk):
     data = books_collection.find_one({"_id": ObjectId(pk)})
     book = Book.deserialize(data)
-    reviews = get_related_reviews(pk, reviews_collection)
-    sales = get_related_sales(pk, sales_collection)
+    reviews = get_reviews_by_book(pk, reviews_collection)
+    sales = get_sales_by_book(pk, sales_collection)
     print(reviews)
     print(sales)
     return render(request, 'books/book_detail.html', {'book': book, 'reviews': reviews, 'sales': sales})
