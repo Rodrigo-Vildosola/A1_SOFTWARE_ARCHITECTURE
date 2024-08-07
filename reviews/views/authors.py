@@ -3,6 +3,7 @@ from decouple import config
 from bson.objectid import ObjectId
 import pymongo
 from reviews.types import Author
+from reviews.utils import get_author_with_books_reviews_sales
 
 # MongoDB connection
 client = pymongo.MongoClient(config('MONGODB_URI'))
@@ -16,7 +17,9 @@ def get_all_authors():
     return authors
 
 def author_list(request):
-    authors = get_all_authors()
+    authors = get_author_with_books_reviews_sales()
+    for i in authors:
+        print(i)
     return render(request, 'authors/author_list.html', {'authors': authors})
 
 def author_detail(request, pk):

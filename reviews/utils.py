@@ -64,11 +64,21 @@ def get_author_with_books_reviews_sales():
             "$group": {
                 "_id": "$_id",
                 "name": { "$first": "$name" },
-                "number_of_books": { "$sum": 1 },
+                "number_of_books": { "$sum": { "$cond": [{ "$ifNull": ["$books._id", False] }, 1, 0] } },
                 "average_score": { "$avg": "$reviews.score" },
                 "total_sales": { "$sum": "$sales.sales" }
             }
+        },
+        {
+            "$addFields": {
+                "id": { "$toString": "$_id" }
+            }
         }
+        # {
+        #     "$project": {
+        #         "_id": 0
+        #     }
+        # }
     ])
     return list(authors_aggregate)
 
