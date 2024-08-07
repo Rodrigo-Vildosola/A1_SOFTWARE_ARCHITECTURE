@@ -10,16 +10,9 @@ client = pymongo.MongoClient(config('MONGODB_URI'))
 db = client[config('DB_NAME')]
 authors_collection = db['authors']
 
-def get_all_authors():
-    authors = []
-    for data in authors_collection.find():
-        authors.append(Author.deserialize(data))
-    return authors
 
 def author_list(request):
     authors = get_author_with_books_reviews_sales()
-    for i in authors:
-        print(i)
     return render(request, 'authors/author_list.html', {'authors': authors})
 
 def author_detail(request, pk):
