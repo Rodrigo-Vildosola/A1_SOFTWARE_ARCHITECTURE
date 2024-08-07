@@ -7,7 +7,7 @@
 <ul class="list-disc pl-5">
     {% for author in authors %}
         <li class="mb-2">
-            <a href="{% url 'author_detail' author.pk %}" class="text-blue-500 hover:underline">{{ author.name }}</a>
+            <a href="{% url 'author_detail' author.id %}" class="text-blue-500 hover:underline">{{ author.name }}</a>
         </li>
     {% endfor %}
 </ul>

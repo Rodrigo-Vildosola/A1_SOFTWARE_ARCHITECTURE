@@ -8,7 +8,7 @@
 <p><strong>Country of Origin:</strong> {{ author.country_of_origin }}</p>
 <p><strong>Description:</strong> {{ author.short_description }}</p>
 <div class="mt-4">
-    <a href="{% url 'author_edit' author.pk %}" class="bg-yellow-500 text-white px-4 py-2 rounded mr-2">Edit</a>
-    <a href="{% url 'author_delete' author.pk %}" class="bg-red-500 text-white px-4 py-2 rounded">Delete</a>
+    <a href="{% url 'author_edit' author.id %}" class="bg-yellow-500 text-white px-4 py-2 rounded mr-2">Edit</a>
+    <a href="{% url 'author_delete' author.id %}" class="bg-red-500 text-white px-4 py-2 rounded">Delete</a>
 </div>
 {% endblock %}
