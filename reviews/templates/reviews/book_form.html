@@ -1,12 +1,35 @@
 {% extends "base_generic.html" %}
 
-{% block title %}{% if form.instance.pk %}Edit Book{% else %}Add Book{% endif %}{% endblock %}
+{% block title %}{% if book %}Edit Book{% else %}Add Book{% endif %}{% endblock %}
 
 {% block content %}
-<h1 class="text-2xl font-bold mb-4">{% if form.instance.pk %}Edit Book{% else %}Add Book{% endif %}</h1>
+<h1 class="text-2xl font-bold mb-4">{% if book %}Edit Book{% else %}Add Book{% endif %}</h1>
 <form method="post" class="bg-white p-4 rounded shadow-md">
     {% csrf_token %}
-    {{ form.as_p }}
+    <div class="mb-4">
+        <label for="name" class="block text-gray-700">Name</label>
+        <input type="text" id="name" name="name" value="{% if book %}{{ book.name }}{% endif %}" class="mt-1 block w-full">
+    </div>
+    <div class="mb-4">
+        <label for="summary" class="block text-gray-700">Summary</label>
+        <textarea id="summary" name="summary" class="mt-1 block w-full">{% if book %}{{ book.summary }}{% endif %}</textarea>
+    </div>
+    <div class="mb-4">
+        <label for="date_of_publication" class="block text-gray-700">Date of Publication</label>
+        <input type="date" id="date_of_publication" name="date_of_publication" value="{% if book %}{{ book.date_of_publication|date:'Y-m-d' }}{% endif %}" class="mt-1 block w-full">
+    </div>
+    <div class="mb-4">
+        <label for="number_of_sales" class="block text-gray-700">Number of Sales</label>
+        <input type="number" id="number_of_sales" name="number_of_sales" value="{% if book %}{{ book.number_of_sales }}{% endif %}" class="mt-1 block w-full">
+    </div>
+    <div class="mb-4">
+        <label for="author_id" class="block text-gray-700">Author</label>
+        <select id="author_id" name="author_id" class="mt-1 block w-full">
+            {% for author in authors %}
+                <option value="{{ author.id }}" {% if book and book.author_id == author.id %}selected{% endif %}>{{ author.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
     <button type="submit" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">Save</button>
 </form>
 {% endblock %}

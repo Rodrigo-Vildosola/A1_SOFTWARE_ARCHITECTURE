@@ -7,9 +7,8 @@
 <p><strong>Summary:</strong> {{ book.summary }}</p>
 <p><strong>Date of Publication:</strong> {{ book.date_of_publication }}</p>
 <p><strong>Number of Sales:</strong> {{ book.number_of_sales }}</p>
-<p><strong>Author:</strong> <a href="{% url 'author_detail' book.author.pk %}" class="text-blue-500 hover:underline">{{ book.author.name }}</a></p>
 <div class="mt-4">
-    <a href="{% url 'book_edit' book.pk %}" class="bg-yellow-500 text-white px-4 py-2 rounded mr-2">Edit</a>
-    <a href="{% url 'book_delete' book.pk %}" class="bg-red-500 text-white px-4 py-2 rounded">Delete</a>
+    <a href="{% url 'book_edit' book.id %}" class="bg-yellow-500 text-white px-4 py-2 rounded mr-2">Edit</a>
+    <a href="{% url 'book_delete' book.id %}" class="bg-red-500 text-white px-4 py-2 rounded">Delete</a>
 </div>
 {% endblock %}

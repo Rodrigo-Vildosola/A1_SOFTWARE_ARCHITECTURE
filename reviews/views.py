@@ -17,20 +17,18 @@ salesbyyear_collection = db['salesbyyear']
 def get_all(collection):
     collection_data = []
     for i in collection.find():
-        i['id'] = i['_id']
+        i['id'] = str(i['_id'])
         collection_data.append(i)
     return collection_data
-
 
 # Author Views
 def author_list(request):
     authors = get_all(authors_collection)
-    print(authors)
     return render(request, 'reviews/author_list.html', {'authors': authors})
 
 def author_detail(request, pk):
     author = authors_collection.find_one({"_id": ObjectId(pk)})
-    author['id'] = author['_id']
+    author['id'] = str(author['_id'])
     return render(request, 'reviews/author_detail.html', {'author': author})
 
 def author_create(request):
@@ -60,7 +58,7 @@ def author_edit(request, pk):
         }
         authors_collection.update_one({'_id': ObjectId(pk)}, {'$set': updated_data})
         return redirect('author_list')
-    author['id'] = author['_id']
+    author['id'] = str(author['_id'])
     return render(request, 'reviews/author_form.html', {'author': author})
 
 def author_delete(request, pk):
@@ -68,17 +66,17 @@ def author_delete(request, pk):
     if request.method == "POST":
         authors_collection.delete_one({'_id': ObjectId(pk)})
         return redirect('author_list')
-    author['id'] = author['_id']
+    author['id'] = str(author['_id'])
     return render(request, 'reviews/author_confirm_delete.html', {'author': author})
-
 
 # Book Views
 def book_list(request):
-    books = books_collection.find()
+    books = get_all(books_collection)
     return render(request, 'reviews/book_list.html', {'books': books})
 
 def book_detail(request, pk):
     book = books_collection.find_one({"_id": ObjectId(pk)})
+    book['id'] = str(book['_id'])
     return render(request, 'reviews/book_detail.html', {'book': book})
 
 def book_create(request):
@@ -97,7 +95,7 @@ def book_create(request):
         }
         books_collection.insert_one(book)
         return redirect('book_list')
-    authors = authors_collection.find()
+    authors = get_all(authors_collection)
     return render(request, 'reviews/book_form.html', {'authors': authors})
 
 def book_edit(request, pk):
@@ -112,7 +110,8 @@ def book_edit(request, pk):
         }
         books_collection.update_one({'_id': ObjectId(pk)}, {'$set': updated_data})
         return redirect('book_list')
-    authors = authors_collection.find()
+    book['id'] = str(book['_id'])
+    authors = get_all(authors_collection)
     return render(request, 'reviews/book_form.html', {'book': book, 'authors': authors})
 
 def book_delete(request, pk):
@@ -120,15 +119,17 @@ def book_delete(request, pk):
     if request.method == "POST":
         books_collection.delete_one({'_id': ObjectId(pk)})
         return redirect('book_list')
+    book['id'] = str(book['_id'])
     return render(request, 'reviews/book_confirm_delete.html', {'book': book})
 
 # Review Views
 def review_list(request):
-    reviews = reviews_collection.find()
+    reviews = get_all(reviews_collection)
     return render(request, 'reviews/review_list.html', {'reviews': reviews})
 
 def review_detail(request, pk):
     review = reviews_collection.find_one({"_id": ObjectId(pk)})
+    review['id'] = str(review['_id'])
     return render(request, 'reviews/review_detail.html', {'review': review})
 
 def review_create(request):
@@ -145,7 +146,7 @@ def review_create(request):
         }
         reviews_collection.insert_one(review)
         return redirect('review_list')
-    books = books_collection.find()
+    books = get_all(books_collection)
     return render(request, 'reviews/review_form.html', {'books': books})
 
 def review_edit(request, pk):
@@ -159,7 +160,8 @@ def review_edit(request, pk):
         }
         reviews_collection.update_one({'_id': ObjectId(pk)}, {'$set': updated_data})
         return redirect('review_list')
-    books = books_collection.find()
+    review['id'] = str(review['_id'])
+    books = get_all(books_collection)
     return render(request, 'reviews/review_form.html', {'review': review, 'books': books})
 
 def review_delete(request, pk):
@@ -167,15 +169,17 @@ def review_delete(request, pk):
     if request.method == "POST":
         reviews_collection.delete_one({'_id': ObjectId(pk)})
         return redirect('review_list')
+    review['id'] = str(review['_id'])
     return render(request, 'reviews/review_confirm_delete.html', {'review': review})
 
 # SalesByYear Views
 def salesbyyear_list(request):
-    sales = salesbyyear_collection.find()
+    sales = get_all(salesbyyear_collection)
     return render(request, 'reviews/salesbyyear_list.html', {'sales': sales})
 
 def salesbyyear_detail(request, pk):
     sales = salesbyyear_collection.find_one({"_id": ObjectId(pk)})
+    sales['id'] = str(sales['_id'])
     return render(request, 'reviews/salesbyyear_detail.html', {'sales': sales})
 
 def salesbyyear_create(request):
@@ -190,7 +194,7 @@ def salesbyyear_create(request):
         }
         salesbyyear_collection.insert_one(sales_record)
         return redirect('salesbyyear_list')
-    books = books_collection.find()
+    books = get_all(books_collection)
     return render(request, 'reviews/salesbyyear_form.html', {'books': books})
 
 def salesbyyear_edit(request, pk):
@@ -203,7 +207,8 @@ def salesbyyear_edit(request, pk):
         }
         salesbyyear_collection.update_one({'_id': ObjectId(pk)}, {'$set': updated_data})
         return redirect('salesbyyear_list')
-    books = books_collection.find()
+    sales['id'] = str(sales['_id'])
+    books = get_all(books_collection)
     return render(request, 'reviews/salesbyyear_form.html', {'sales': sales, 'books': books})
 
 def salesbyyear_delete(request, pk):
@@ -211,4 +216,5 @@ def salesbyyear_delete(request, pk):
     if request.method == "POST":
         salesbyyear_collection.delete_one({'_id': ObjectId(pk)})
         return redirect('salesbyyear_list')
+    sales['id'] = str(sales['_id'])
     return render(request, 'reviews/salesbyyear_confirm_delete.html', {'sales': sales})
