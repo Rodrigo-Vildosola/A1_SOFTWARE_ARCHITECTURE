@@ -3,13 +3,16 @@ from decouple import config
 from bson.objectid import ObjectId
 import pymongo
 from reviews.types import Book
-from reviews.utils import get_all
+from reviews.utils import get_all, get_related_reviews, get_related_sales
 
 # MongoDB connection
 client = pymongo.MongoClient(config('MONGODB_URI'))
 db = client[config('DB_NAME')]
 books_collection = db['books']
 authors_collection = db['authors']
+reviews_collection = db['reviews']
+sales_collection = db['sales']
+
 
 def get_all_books():
     books = []
@@ -24,7 +27,11 @@ def book_list(request):
 def book_detail(request, pk):
     data = books_collection.find_one({"_id": ObjectId(pk)})
     book = Book.deserialize(data)
-    return render(request, 'reviews/book_detail.html', {'book': book})
+    reviews = get_related_reviews(pk, reviews_collection)
+    sales = get_related_sales(pk, sales_collection)
+    print(reviews)
+    print(sales)
+    return render(request, 'reviews/book_detail.html', {'book': book, 'reviews': reviews, 'sales': sales})
 
 def book_create(request):
     if request.method == "POST":
