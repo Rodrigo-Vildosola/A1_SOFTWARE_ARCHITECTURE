@@ -22,7 +22,7 @@ def get_all_books():
 
 def book_list(request):
     books = get_all_books()
-    return render(request, 'reviews/book_list.html', {'books': books})
+    return render(request, 'books/book_list.html', {'books': books})
 
 def book_detail(request, pk):
     data = books_collection.find_one({"_id": ObjectId(pk)})
@@ -31,7 +31,7 @@ def book_detail(request, pk):
     sales = get_related_sales(pk, sales_collection)
     print(reviews)
     print(sales)
-    return render(request, 'reviews/book_detail.html', {'book': book, 'reviews': reviews, 'sales': sales})
+    return render(request, 'books/book_detail.html', {'book': book, 'reviews': reviews, 'sales': sales})
 
 def book_create(request):
     if request.method == "POST":
@@ -45,7 +45,7 @@ def book_create(request):
         books_collection.insert_one(book.serialize())
         return redirect('book_list')
     authors = get_all(authors_collection)
-    return render(request, 'reviews/book_form.html', {'authors': authors})
+    return render(request, 'books/book_form.html', {'authors': authors})
 
 def book_edit(request, pk):
     data = books_collection.find_one({"_id": ObjectId(pk)})
@@ -62,7 +62,7 @@ def book_edit(request, pk):
         books_collection.update_one({'_id': ObjectId(pk)}, {'$set': updated_book.serialize()})
         return redirect('book_list')
     authors = get_all(authors_collection)
-    return render(request, 'reviews/book_form.html', {'book': book, 'authors': authors})
+    return render(request, 'books/book_form.html', {'book': book, 'authors': authors})
 
 def book_delete(request, pk):
     data = books_collection.find_one({"_id": ObjectId(pk)})
@@ -70,4 +70,4 @@ def book_delete(request, pk):
     if request.method == "POST":
         books_collection.delete_one({'_id': ObjectId(pk)})
         return redirect('book_list')
-    return render(request, 'reviews/book_confirm_delete.html', {'book': book})
+    return render(request, 'books/book_confirm_delete.html', {'book': book})

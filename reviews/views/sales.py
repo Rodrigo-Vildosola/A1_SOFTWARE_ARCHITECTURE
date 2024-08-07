@@ -19,12 +19,12 @@ def get_all_sales():
 
 def sales_list(request):
     sales = get_all_sales()
-    return render(request, 'reviews/sales_list.html', {'sales': sales})
+    return render(request, 'sales/sales_list.html', {'sales': sales})
 
 def sale_detail(request, pk):
     data = sales_collection.find_one({"_id": ObjectId(pk)})
     sales = Sales.deserialize(data)
-    return render(request, 'reviews/sale_detail.html', {'sales': sales})
+    return render(request, 'sales/sale_detail.html', {'sales': sales})
 
 def sale_create(request):
     if request.method == "POST":
@@ -36,7 +36,7 @@ def sale_create(request):
         sales_collection.insert_one(sales.serialize())
         return redirect('sales_list')
     books = get_all(books_collection)
-    return render(request, 'reviews/sale_form.html', {'books': books})
+    return render(request, 'sales/sale_form.html', {'books': books})
 
 def sale_edit(request, pk):
     data = sales_collection.find_one({"_id": ObjectId(pk)})
@@ -51,7 +51,7 @@ def sale_edit(request, pk):
         sales_collection.update_one({'_id': ObjectId(pk)}, {'$set': updated_sales.serialize()})
         return redirect('sales_list')
     books = get_all(books_collection)
-    return render(request, 'reviews/sale_form.html', {'sales': sales, 'books': books})
+    return render(request, 'sales/sale_form.html', {'sales': sales, 'books': books})
 
 def sale_delete(request, pk):
     data = sales_collection.find_one({"_id": ObjectId(pk)})
@@ -59,4 +59,4 @@ def sale_delete(request, pk):
     if request.method == "POST":
         sales_collection.delete_one({'_id': ObjectId(pk)})
         return redirect('sales_list')
-    return render(request, 'reviews/sale_confirm_delete.html', {'sales': sales})
+    return render(request, 'sales/sale_confirm_delete.html', {'sales': sales})
