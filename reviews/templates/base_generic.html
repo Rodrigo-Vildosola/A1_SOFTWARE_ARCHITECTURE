@@ -8,13 +8,34 @@
 </head>
 <body class="bg-gray-100">
     <nav class="bg-gray-800 p-4">
-        <div class="container mx-auto">
+        <div class="container mx-auto flex justify-between items-center">
             <a href="/" class="text-white text-lg font-semibold">Book Review App</a>
+            <div class="relative">
+                <button id="dropdownButton" class="text-white focus:outline-none">
+                    Menu
+                </button>
+                <div id="dropdownMenu" class="hidden absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg py-1">
+                    <a href="/authors" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Authors</a>
+                    <a href="/books" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Books</a>
+                    <a href="/reviews" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Reviews</a>
+                    <a href="/sales" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">Sales</a>
+                </div>
+            </div>
         </div>
     </nav>
     <div class="container mx-auto mt-8">
         {% block content %}
         {% endblock %}
     </div>
+    <script>
+        document.getElementById('dropdownButton').addEventListener('click', function() {
+            var dropdownMenu = document.getElementById('dropdownMenu');
+            if (dropdownMenu.classList.contains('hidden')) {
+                dropdownMenu.classList.remove('hidden');
+            } else {
+                dropdownMenu.classList.add('hidden');
+            }
+        });
+    </script>
 </body>
 </html>

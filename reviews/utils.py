@@ -2,10 +2,10 @@ from pymongo import MongoClient
 from bson.objectid import ObjectId
 from decouple import config
 from .types import Author, Book, Review, Sales
+from .mongo import Mongo
 
 # MongoDB connection
-client = MongoClient(config('MONGODB_URI'))
-db = client[config('DB_NAME')]
+db = Mongo().database
 
 authors_collection = db['authors']
 books_collection = db['books']

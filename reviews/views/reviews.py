@@ -4,10 +4,10 @@ from bson.objectid import ObjectId
 import pymongo
 from reviews.types import Review
 from reviews.utils import get_all
+from reviews.mongo import Mongo
 
 # MongoDB connection
-client = pymongo.MongoClient(config('MONGODB_URI'))
-db = client[config('DB_NAME')]
+db = Mongo().database
 reviews_collection = db['reviews']
 books_collection = db['books']
 

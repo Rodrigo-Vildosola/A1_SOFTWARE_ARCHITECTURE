@@ -1,5 +1,6 @@
 from django.urls import path
 from .views import (
+    home,
     author_list, author_detail, author_create, author_edit, author_delete,
     book_list, book_detail, book_create, book_edit, book_delete,
     review_list, review_detail, review_create, review_edit, review_delete,
@@ -7,6 +8,8 @@ from .views import (
 )
 
 urlpatterns = [
+    path('', home, name='home_page'),
+    
     path('authors/', author_list, name='author_list'),
     path('author/new/', author_create, name='author_create'),
     path('author/<str:pk>/edit/', author_edit, name='author_edit'),

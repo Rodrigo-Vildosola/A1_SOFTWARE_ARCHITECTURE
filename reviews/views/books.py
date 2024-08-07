@@ -3,10 +3,10 @@ from decouple import config
 from bson.objectid import ObjectId
 import pymongo
 from reviews.utils import get_all, get_reviews_by_book, get_sales_by_book
+from reviews.mongo import Mongo
 
 # MongoDB connection
-client = pymongo.MongoClient(config('MONGODB_URI'))
-db = client[config('DB_NAME')]
+db = Mongo().database
 books_collection = db['books']
 authors_collection = db['authors']
 reviews_collection = db['reviews']
