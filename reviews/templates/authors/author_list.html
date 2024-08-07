@@ -3,41 +3,43 @@
 {% block title %}Authors{% endblock %}
 
 {% block content %}
-<h1 class="text-2xl font-bold mb-4">Authors</h1>
-<div class="overflow-x-auto">
-    <table class="min-w-full bg-white border border-gray-200">
-        <thead>
-            <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-                <th class="py-3 px-6 text-left">Name</th>
-                <th class="py-3 px-6 text-left">Number of Books</th>
-                <th class="py-3 px-6 text-left">Average Score</th>
-                <th class="py-3 px-6 text-left">Total Sales</th>
-                <th class="py-3 px-6 text-left">Actions</th>
-            </tr>
-        </thead>
-        <tbody class="text-gray-600 text-sm font-light">
-            {% for author in authors %}
-                <tr class="border-b border-gray-200 hover:bg-gray-100">
-                    <td class="py-3 px-6 text-left whitespace-nowrap">
-                        <a href="{% url 'author_detail' author.id %}" class="text-blue-500 hover:underline">{{ author.name }}</a>
-                    </td>
-                    <td class="py-3 px-6 text-left">
-                        {{ author.number_of_books }}
-                    </td>
-                    <td class="py-3 px-6 text-left">
-                        {{ author.average_score|default:"N/A" }}
-                    </td>
-                    <td class="py-3 px-6 text-left">
-                        {{ author.total_sales|default:"N/A" }}
-                    </td>
-                    <td class="py-3 px-6 text-left">
-                        <a href="{% url 'author_edit' author.id %}" class="text-yellow-500 hover:underline">Edit</a> |
-                        <a href="{% url 'author_delete' author.id %}" class="text-red-500 hover:underline">Delete</a>
-                    </td>
+<div class="max-w-6xl mx-auto mt-6">
+    <h1 class="text-3xl font-bold mb-4 text-indigo-600">Authors</h1>
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-white border border-gray-200">
+            <thead>
+                <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+                    <th class="py-3 px-6 text-left">Name</th>
+                    <th class="py-3 px-6 text-left">Number of Books</th>
+                    <th class="py-3 px-6 text-left">Average Score</th>
+                    <th class="py-3 px-6 text-left">Total Sales</th>
+                    <th class="py-3 px-6 text-left">Actions</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody class="text-gray-600 text-sm font-light">
+                {% for author in authors %}
+                    <tr class="border-b border-gray-200 hover:bg-gray-100 transition duration-200">
+                        <td class="py-3 px-6 text-left whitespace-nowrap">
+                            <a href="{% url 'author_detail' author.id %}" class="text-indigo-600 hover:underline">{{ author.name }}</a>
+                        </td>
+                        <td class="py-3 px-6 text-left">
+                            {{ author.number_of_books }}
+                        </td>
+                        <td class="py-3 px-6 text-left">
+                            {{ author.average_score|default:"N/A" }}
+                        </td>
+                        <td class="py-3 px-6 text-left">
+                            {{ author.total_sales|default:"N/A" }}
+                        </td>
+                        <td class="py-3 px-6 text-left">
+                            <a href="{% url 'author_edit' author.id %}" class="text-yellow-500 hover:underline">Edit</a> |
+                            <a href="{% url 'author_delete' author.id %}" class="text-red-500 hover:underline">Delete</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <a href="{% url 'author_create' %}" class="mt-4 inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300">Add new author</a>
 </div>
-<a href="{% url 'author_create' %}" class="mt-4 inline-block bg-blue-500 text-white px-4 py-2 rounded">Add new author</a>
 {% endblock %}

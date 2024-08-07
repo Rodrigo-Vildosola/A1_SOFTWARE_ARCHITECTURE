@@ -3,25 +3,27 @@
 {% block title %}{% if author %}Edit Author{% else %}Add Author{% endif %}{% endblock %}
 
 {% block content %}
-<h1 class="text-2xl font-bold mb-4">{% if author %}Edit Author{% else %}Add Author{% endif %}</h1>
-<form method="post" class="bg-white p-4 rounded shadow-md">
-    {% csrf_token %}
-    <div class="mb-4">
-        <label for="name" class="block text-gray-700">Name</label>
-        <input type="text" id="name" name="name" value="{% if author %}{{ author.name }}{% endif %}" class="mt-1 block w-full">
-    </div>
-    <div class="mb-4">
-        <label for="date_of_birth" class="block text-gray-700">Date of Birth</label>
-        <input type="date" id="date_of_birth" name="date_of_birth" value="{% if author %}{{ author.date_of_birth|date:'Y-m-d' }}{% endif %}" class="mt-1 block w-full">
-    </div>
-    <div class="mb-4">
-        <label for="country_of_origin" class="block text-gray-700">Country of Origin</label>
-        <input type="text" id="country_of_origin" name="country_of_origin" value="{% if author %}{{ author.country_of_origin }}{% endif %}" class="mt-1 block w-full">
-    </div>
-    <div class="mb-4">
-        <label for="short_description" class="block text-gray-700">Short Description</label>
-        <textarea id="short_description" name="short_description" class="mt-1 block w-full">{% if author %}{{ author.short_description }}{% endif %}</textarea>
-    </div>
-    <button type="submit" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded">Save</button>
-</form>
+<div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden mt-6 p-6">
+    <h1 class="text-3xl font-bold mb-4 text-indigo-600">{% if author %}Edit Author{% else %}Add Author{% endif %}</h1>
+    <form method="post" class="space-y-4">
+        {% csrf_token %}
+        <div>
+            <label for="name" class="block text-gray-700">Name</label>
+            <input type="text" id="name" name="name" value="{% if author %}{{ author.name }}{% endif %}" class="mt-1 p-2 block w-full border border-gray-300 rounded-md shadow-sm">
+        </div>
+        <div>
+            <label for="date_of_birth" class="block text-gray-700">Date of Birth</label>
+            <input type="date" id="date_of_birth" name="date_of_birth" value="{% if author %}{{ author.date_of_birth|date:'Y-m-d' }}{% endif %}" class="mt-1 p-2 block w-full border border-gray-300 rounded-md shadow-sm">
+        </div>
+        <div>
+            <label for="country_of_origin" class="block text-gray-700">Country of Origin</label>
+            <input type="text" id="country_of_origin" name="country_of_origin" value="{% if author %}{{ author.country_of_origin }}{% endif %}" class="mt-1 p-2 block w-full border border-gray-300 rounded-md shadow-sm">
+        </div>
+        <div>
+            <label for="short_description" class="block text-gray-700">Short Description</label>
+            <textarea id="short_description" name="short_description" class="mt-1 p-2 block w-full border border-gray-300 rounded-md shadow-sm">{% if author %}{{ author.short_description }}{% endif %}</textarea>
+        </div>
+        <button type="submit" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300">Save</button>
+    </form>
+</div>
 {% endblock %}

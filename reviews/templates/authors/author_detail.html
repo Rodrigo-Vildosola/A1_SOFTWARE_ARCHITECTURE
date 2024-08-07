@@ -3,12 +3,16 @@
 {% block title %}Author Detail{% endblock %}
 
 {% block content %}
-<h1 class="text-2xl font-bold mb-4">{{ author.name }}</h1>
-<p><strong>Date of Birth:</strong> {{ author.date_of_birth }}</p>
-<p><strong>Country of Origin:</strong> {{ author.country_of_origin }}</p>
-<p><strong>Description:</strong> {{ author.short_description }}</p>
-<div class="mt-4">
-    <a href="{% url 'author_edit' author.id %}" class="bg-yellow-500 text-white px-4 py-2 rounded mr-2">Edit</a>
-    <a href="{% url 'author_delete' author.id %}" class="bg-red-500 text-white px-4 py-2 rounded">Delete</a>
+<div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden mt-6">
+    <div class="px-6 py-4">
+        <h1 class="text-3xl font-bold mb-4 text-indigo-600">{{ author.name }}</h1>
+        <p class="text-gray-700"><strong>Date of Birth:</strong> {{ author.date_of_birth }}</p>
+        <p class="text-gray-700"><strong>Country of Origin:</strong> {{ author.country_of_origin }}</p>
+        <p class="text-gray-700"><strong>Description:</strong> {{ author.short_description }}</p>
+        <div class="mt-4">
+            <a href="{% url 'author_edit' author.id %}" class="bg-yellow-500 text-white px-4 py-2 rounded mr-2 hover:bg-yellow-600 transition duration-300">Edit</a>
+            <a href="{% url 'author_delete' author.id %}" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-300">Delete</a>
+        </div>
+    </div>
 </div>
 {% endblock %}

@@ -20,13 +20,22 @@ def get_all(collection):
     return collection_data
 
 def get_books_by_author(author_id):
-    return list(books_collection.find({"author_id": ObjectId(author_id)}))
+    books = books_collection.find({"author_id": ObjectId(author_id)})
+    for book in books:
+        book['id'] = str(book['_id'])
+    return list(books)
 
 def get_reviews_by_book(book_id):
-    return list(reviews_collection.find({"book_id": ObjectId(book_id)}))
+    reviews = reviews_collection.find({"book_id": ObjectId(book_id)})
+    for review in reviews:
+        review['id'] = str(review['_id'])
+    return list(reviews)
 
 def get_sales_by_book(book_id):
-    return list(sales_collection.find({"book_id": ObjectId(book_id)}))
+    sales = sales_collection.find({"book_id": ObjectId(book_id)})
+    for sale in sales:
+        sale['id'] = str(sale['_id'])
+    return list(sales)
 
 def get_author_with_books_reviews_sales():
     authors_aggregate = authors_collection.aggregate([
@@ -73,15 +82,14 @@ def get_author_with_books_reviews_sales():
             "$addFields": {
                 "id": { "$toString": "$_id" }
             }
+        },
+        {
+            "$project": {
+                "_id": 0
+            }
         }
-        # {
-        #     "$project": {
-        #         "_id": 0
-        #     }
-        # }
     ])
     return list(authors_aggregate)
-
 
 def get_top_rated_books_with_reviews():
     top_rated_books_aggregate = books_collection.aggregate([
@@ -97,7 +105,8 @@ def get_top_rated_books_with_reviews():
             "$addFields": {
                 "average_score": { "$avg": "$reviews.score" },
                 "highest_review": { "$arrayElemAt": [{ "$sortArray": { "input": "$reviews", "sortBy": { "score": -1 } } }, 0] },
-                "lowest_review": { "$arrayElemAt": [{ "$sortArray": { "input": "$reviews", "sortBy": { "score": 1 } } }, 0] }
+                "lowest_review": { "$arrayElemAt": [{ "$sortArray": { "input": "$reviews", "sortBy": { "score": 1 } } }, 0] },
+                "id": { "$toString": "$_id" }
             }
         },
         {
@@ -105,10 +114,14 @@ def get_top_rated_books_with_reviews():
         },
         {
             "$limit": 10
+        },
+        {
+            "$project": {
+                "_id": 0
+            }
         }
     ])
     return list(top_rated_books_aggregate)
-
 
 def get_top_selling_books():
     top_selling_books_aggregate = books_collection.aggregate([
@@ -157,7 +170,8 @@ def get_top_selling_books():
                         "as": "sale",
                         "in": "$$sale.year"
                     }
-                }
+                },
+                "id": { "$toString": "$_id" }
             }
         },
         {
@@ -165,10 +179,14 @@ def get_top_selling_books():
         },
         {
             "$limit": 50
+        },
+        {
+            "$project": {
+                "_id": 0
+            }
         }
     ])
     return list(top_selling_books_aggregate)
-
 
 def search_books(query, page=1, limit=10):
     skip = (page - 1) * limit
@@ -178,4 +196,10 @@ def search_books(query, page=1, limit=10):
     ).sort(
         [("score", { "$meta": "textScore" })]
     ).skip(skip).limit(limit)
-    return list(search_results)
+    
+    books = []
+    for book in search_results:
+        book['id'] = str(book['_id'])
+        books.append(book)
+    
+    return books
