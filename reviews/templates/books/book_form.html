@@ -1,4 +1,6 @@
 {% extends "base_generic.html" %}
+{% load custom_filters %}
+
 
 {% block title %}{% if book %}Edit Book{% else %}Add Book{% endif %}{% endblock %}
 
@@ -27,7 +29,7 @@
             <label for="author_id" class="block text-gray-700">Author</label>
             <select required id="author_id" name="author_id" class="mt-1 p-2 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
                 {% for author in authors %}
-                    <option value="{{ author.id }}" {% if book and book.author_id == author.id %}selected{% endif %}>{{ author.name }}</option>
+                    <option value="{{ author|get_id }}" {% if book and book.author_id == author|get_id %}selected{% endif %}>{{ author.name }}</option>
                 {% endfor %}
             </select>
         </div>

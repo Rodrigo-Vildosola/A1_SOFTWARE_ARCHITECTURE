@@ -1,4 +1,5 @@
 {% extends "base_generic.html" %}
+{% load custom_filters %}
 
 {% block title %}Confirm Delete{% endblock %}
 
@@ -9,7 +10,7 @@
     <form method="post" class="mt-4">
         {% csrf_token %}
         <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-300">Yes, delete</button>
-        <a href="{% url 'book_detail' book.id %}" class="ml-4 inline-block bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition duration-300">Cancel</a>
+        <a href="{% url 'book_detail' book|get_id %}" class="ml-4 inline-block bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition duration-300">Cancel</a>
     </form>
 </div>
 {% endblock %}

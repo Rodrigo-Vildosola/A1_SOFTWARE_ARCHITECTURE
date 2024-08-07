@@ -1,4 +1,6 @@
 {% extends "base_generic.html" %}
+{% load custom_filters %}
+
 
 {% block title %}Confirm Delete{% endblock %}
 
@@ -10,6 +12,6 @@
         {% csrf_token %}
         <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-300">Yes, delete</button>
     </form>
-    <a href="{% url 'author_detail' author.id %}" class="mt-4 inline-block bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition duration-300">Cancel</a>
+    <a href="{% url 'author_detail' author|get_id %}" class="mt-4 inline-block bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition duration-300">Cancel</a>
 </div>
 {% endblock %}

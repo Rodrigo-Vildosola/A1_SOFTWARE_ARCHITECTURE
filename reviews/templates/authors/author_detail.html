@@ -1,4 +1,5 @@
 {% extends "base_generic.html" %}
+{% load custom_filters %}
 
 {% block title %}Author Detail{% endblock %}
 
@@ -10,8 +11,8 @@
         <p class="text-gray-700"><strong>Country of Origin:</strong> {{ author.country_of_origin }}</p>
         <p class="text-gray-700"><strong>Description:</strong> {{ author.short_description }}</p>
         <div class="mt-4">
-            <a href="{% url 'author_edit' author.id %}" class="bg-yellow-500 text-white px-4 py-2 rounded mr-2 hover:bg-yellow-600 transition duration-300">Edit</a>
-            <a href="{% url 'author_delete' author.id %}" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-300">Delete</a>
+            <a href="{% url 'author_edit' author|get_id %}" class="bg-yellow-500 text-white px-4 py-2 rounded mr-2 hover:bg-yellow-600 transition duration-300">Edit</a>
+            <a href="{% url 'author_delete' author|get_id %}" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-300">Delete</a>
         </div>
     </div>
 </div>

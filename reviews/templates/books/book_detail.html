@@ -1,4 +1,6 @@
 {% extends "base_generic.html" %}
+{% load custom_filters %}
+
 
 {% block title %}Book Detail{% endblock %}
 
@@ -43,8 +45,8 @@
     </div>
 
     <div class="mt-4">
-        <a href="{% url 'book_edit' book.id %}" class="bg-yellow-500 text-white px-4 py-2 rounded mr-2 hover:bg-yellow-600 transition duration-300">Edit</a>
-        <a href="{% url 'book_delete' book.id %}" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-300">Delete</a>
+      <a href="{% url 'book_edit' book|get_id %}" class="bg-yellow-500 text-white px-4 py-2 rounded mr-2 hover:bg-yellow-600 transition duration-300">Edit</a>
+      <a href="{% url 'book_delete' book|get_id %}" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-300">Delete</a>
     </div>
 </div>
 {% endblock %}

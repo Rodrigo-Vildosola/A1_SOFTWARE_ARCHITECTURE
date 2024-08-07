@@ -1,4 +1,5 @@
 {% extends "base_generic.html" %}
+{% load custom_filters %}
 
 {% block title %}Authors{% endblock %}
 
@@ -20,7 +21,7 @@
                 {% for author in authors %}
                     <tr class="border-b border-gray-200 hover:bg-gray-100 transition duration-200">
                         <td class="py-3 px-6 text-left whitespace-nowrap">
-                            <a href="{% url 'author_detail' author.id %}" class="text-indigo-600 hover:underline">{{ author.name }}</a>
+                            <a href="{% url 'author_detail' author|get_id %}" class="text-indigo-600 hover:underline">{{ author.name }}</a>
                         </td>
                         <td class="py-3 px-6 text-left">
                             {{ author.number_of_books }}
@@ -32,8 +33,8 @@
                             {{ author.total_sales|default:"N/A" }}
                         </td>
                         <td class="py-3 px-6 text-left">
-                            <a href="{% url 'author_edit' author.id %}" class="text-yellow-500 hover:underline">Edit</a> |
-                            <a href="{% url 'author_delete' author.id %}" class="text-red-500 hover:underline">Delete</a>
+                            <a href="{% url 'author_edit' author|get_id %}" class="text-yellow-500 hover:underline">Edit</a> |
+                            <a href="{% url 'author_delete' author|get_id %}" class="text-red-500 hover:underline">Delete</a>
                         </td>
                     </tr>
                 {% endfor %}

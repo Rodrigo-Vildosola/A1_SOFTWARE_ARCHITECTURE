@@ -21,20 +21,14 @@ def get_all(collection):
 
 def get_books_by_author(author_id):
     books = books_collection.find({"author_id": ObjectId(author_id)})
-    for book in books:
-        book['id'] = str(book['_id'])
     return list(books)
 
 def get_reviews_by_book(book_id):
     reviews = reviews_collection.find({"book_id": ObjectId(book_id)})
-    for review in reviews:
-        review['id'] = str(review['_id'])
     return list(reviews)
 
 def get_sales_by_book(book_id):
     sales = sales_collection.find({"book_id": ObjectId(book_id)})
-    for sale in sales:
-        sale['id'] = str(sale['_id'])
     return list(sales)
 
 def get_author_with_books_reviews_sales():
@@ -81,11 +75,6 @@ def get_author_with_books_reviews_sales():
         {
             "$addFields": {
                 "id": { "$toString": "$_id" }
-            }
-        },
-        {
-            "$project": {
-                "_id": 0
             }
         }
     ])
