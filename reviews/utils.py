@@ -1,7 +1,6 @@
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 from decouple import config
-from .types import Author, Book, Review, Sales
 from .mongo import Mongo
 
 # MongoDB connection

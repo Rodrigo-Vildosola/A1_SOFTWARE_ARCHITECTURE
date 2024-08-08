@@ -1,52 +1,57 @@
 {% extends "base_generic.html" %}
 {% load custom_filters %}
 
-
 {% block title %}Book Detail{% endblock %}
 
 {% block content %}
-<div class="max-w-xl mx-auto mt-6 bg-white p-6 rounded-lg shadow-lg">
-    <h1 class="text-2xl font-bold mb-4 text-indigo-600">{{ book.name }}</h1>
-    <p class="text-gray-700 mb-2"><strong>Summary:</strong> {{ book.summary }}</p>
-    <p class="text-gray-700 mb-2"><strong>Date of Publication:</strong> {{ book.date_of_publication }}</p>
-    <p class="text-gray-700 mb-2"><strong>Number of Sales:</strong> {{ book.number_of_sales }}</p>
+<div class="max-w-3xl mx-auto mt-8 bg-white p-8 rounded-lg shadow-lg">
+    <h1 class="text-3xl font-bold mb-6 text-indigo-600">{{ book.name }}</h1>
+    <div class="mb-4">
+        <p class="text-gray-700 mb-2"><strong>Summary:</strong> {{ book.summary }}</p>
+        <p class="text-gray-700 mb-2"><strong>Date of Publication:</strong> {{ book.date_of_publication }}</p>
+        <p class="text-gray-700 mb-2"><strong>Number of Sales:</strong> {{ book.number_of_sales }}</p>
+        <p class="text-gray-700 mb-2">
+            <strong>Author:</strong> 
+            <a href="{% url 'author_detail' book.author.id %}" class="text-indigo-600 hover:underline">{{ book.author.name }}</a>
+        </p>
+    </div>
 
-    <div class="mt-6">
-        <h2 class="text-xl font-bold mb-2 text-indigo-600">Reviews</h2>
+    <div class="mb-6">
+        <h2 class="text-2xl font-bold mb-4 text-indigo-600">Reviews</h2>
         {% if reviews %}
-            <ul class="list-disc pl-5 text-gray-700">
+            <div class="space-y-4">
                 {% for review in reviews %}
-                    <li>
-                        <p><strong>Score:</strong> {{ review.score }}</p>
-                        <p>{{ review.review }}</p>
-                        <p><strong>Upvotes:</strong> {{ review.number_of_upvotes }}</p>
-                    </li>
+                    <div class="bg-gray-100 p-4 rounded-lg shadow-md">
+                        <p class="text-gray-700"><strong>Score:</strong> {{ review.score }}</p>
+                        <p class="text-gray-700">{{ review.review }}</p>
+                        <p class="text-gray-700"><strong>Upvotes:</strong> {{ review.number_of_upvotes }}</p>
+                    </div>
                 {% endfor %}
-            </ul>
+            </div>
         {% else %}
             <p class="text-gray-700">No reviews available.</p>
         {% endif %}
     </div>
 
-    <div class="mt-6">
-        <h2 class="text-xl font-bold mb-2 text-indigo-600">Sales</h2>
+    <div class="mb-6">
+        <h2 class="text-2xl font-bold mb-4 text-indigo-600">Sales</h2>
         {% if sales %}
-            <ul class="list-disc pl-5 text-gray-700">
+            <div class="space-y-4">
                 {% for sale in sales %}
-                    <li>
-                        <p><strong>Year:</strong> {{ sale.year }}</p>
-                        <p><strong>Sales:</strong> {{ sale.sales }}</p>
-                    </li>
+                    <div class="bg-gray-100 p-4 rounded-lg shadow-md">
+                        <p class="text-gray-700"><strong>Year:</strong> {{ sale.year }}</p>
+                        <p class="text-gray-700"><strong>Sales:</strong> {{ sale.sales }}</p>
+                    </div>
                 {% endfor %}
-            </ul>
+            </div>
         {% else %}
             <p class="text-gray-700">No sales data available.</p>
         {% endif %}
     </div>
 
-    <div class="mt-4">
-      <a href="{% url 'book_edit' book|get_id %}" class="bg-yellow-500 text-white px-4 py-2 rounded mr-2 hover:bg-yellow-600 transition duration-300">Edit</a>
-      <a href="{% url 'book_delete' book|get_id %}" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-300">Delete</a>
+    <div class="mt-6 flex space-x-4">
+        <a href="{% url 'book_edit' book|get_id %}" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition duration-300">Edit</a>
+        <a href="{% url 'book_delete' book|get_id %}" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-300">Delete</a>
     </div>
 </div>
 {% endblock %}

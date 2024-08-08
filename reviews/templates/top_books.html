@@ -1,4 +1,6 @@
 {% extends "base_generic.html" %}
+{% load custom_filters %}
+
 
 {% block title %}Top Books{% endblock %}
 
@@ -21,12 +23,22 @@
         <tbody class="text-gray-600 text-sm font-light">
             {% for book in top_rated_books %}
                 <tr class="border-b border-gray-200 hover:bg-gray-100 transition duration-200">
-                    <td class="py-3 px-6 text-left">{{ book.title }}</td>
-                    <td class="py-3 px-6 text-left">{{ book.author }}</td>
-                    <td class="py-3 px-6 text-left">{{ book.rating }}</td>
-                    <td class="py-3 px-6 text-left">{{ book.most_popular_review }}</td>
-                    <td class="py-3 px-6 text-left">{{ book.highest_rated_review }}</td>
-                    <td class="py-3 px-6 text-left">{{ book.lowest_rated_review }}</td>
+                    <td class="py-3 px-6 text-left">
+                      <a href="{% url 'book_detail' book|get_id %}" class="text-indigo-600 hover:underline">{{ book.title }} </a>
+                    </td>
+                    <td class="py-3 px-6 text-left">
+                      <a href="{% url 'author_detail' book.author_id %}" class="text-indigo-600 hover:underline">{{ book.author }} </a>
+                    </td>
+                    <td class="py-3 px-6 text-left">{{ book.average_rating }}</td>
+                    <td class="py-3 px-6 text-left">
+                        <a href="{% url 'review_detail' book.most_popular_review|get_id %}" class="text-indigo-600 hover:underline">{{ book.most_popular_review.review }}</a>
+                    </td>
+                    <td class="py-3 px-6 text-left">
+                        <a href="{% url 'review_detail' book.highest_rated_review|get_id %}" class="text-indigo-600 hover:underline">{{ book.highest_rated_review.review }}</a>
+                    </td>
+                    <td class="py-3 px-6 text-left">
+                        <a href="{% url 'review_detail' book.lowest_rated_review|get_id %}" class="text-indigo-600 hover:underline">{{ book.lowest_rated_review.review }}</a>
+                    </td>
                 </tr>
             {% endfor %}
         </tbody>
