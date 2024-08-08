@@ -1,7 +1,3 @@
-Sure, here is a detailed README for your project:
-
----
-
 # A1 Software Architecture
 
 
