@@ -30,8 +30,8 @@ urlpatterns = [
     path('review/<str:pk>/', review_detail, name='review_detail'),
 
     path('sales/', sales_list, name='sales_list'),
-    path('sales/new/', sale_create, name='sales_create'),
-    path('sales/<str:pk>/edit/', sale_edit, name='sales_edit'),
-    path('sales/<str:pk>/delete/', sale_delete, name='sales_delete'),
-    path('sales/<str:pk>/', sale_detail, name='sales_detail'),
+    path('sale/new/', sale_create, name='sale_create'),
+    path('sale/<str:pk>/edit/', sale_edit, name='sale_edit'),
+    path('sale/<str:pk>/delete/', sale_delete, name='sale_delete'),
+    path('sale/<str:pk>/', sale_detail, name='sale_detail'),
 ]

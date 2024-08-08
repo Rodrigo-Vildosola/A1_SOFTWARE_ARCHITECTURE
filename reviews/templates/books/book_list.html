@@ -1,17 +1,39 @@
 {% extends "base_generic.html" %}
 {% load custom_filters %}
 
-
 {% block title %}Books{% endblock %}
 
 {% block content %}
-<h1 class="text-2xl font-bold mb-4">Books</h1>
-<ul class="list-disc pl-5">
-    {% for book in books %}
-        <li class="mb-2">
-            <a href="{% url 'book_detail' book|get_id %}" class="text-blue-500 hover:underline">{{ book.name }}</a>
-        </li>
-    {% endfor %}
-</ul>
-<a href="{% url 'book_create' %}" class="mt-4 inline-block bg-blue-500 text-white px-4 py-2 rounded">Add new book</a>
+<div class="max-w-6xl mx-auto mt-6">
+    <h1 class="text-3xl font-bold mb-4 text-indigo-600">Books</h1>
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-white border border-gray-200">
+            <thead>
+                <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+                    <th class="py-3 px-6 text-left">Name</th>
+                    <th class="py-3 px-6 text-left">Summary</th>
+                    <th class="py-3 px-6 text-left">Date of Publication</th>
+                    <th class="py-3 px-6 text-left">Number of Sales</th>
+                    <th class="py-3 px-6 text-left">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="text-gray-600 text-sm font-light">
+                {% for book in books %}
+                    <tr class="border-b border-gray-200 hover:bg-gray-100">
+                        <td class="py-3 px-6 text-left">{{ book.name }}</td>
+                        <td class="py-3 px-6 text-left">{{ book.summary }}</td>
+                        <td class="py-3 px-6 text-left">{{ book.date_of_publication }}</td>
+                        <td class="py-3 px-6 text-left">{{ book.number_of_sales }}</td>
+                        <td class="py-3 px-6 text-left">
+                            <a href="{% url 'book_detail' book|get_id %}" class="text-blue-500 hover:underline">View</a> |
+                            <a href="{% url 'book_edit' book|get_id %}" class="text-yellow-500 hover:underline">Edit</a> |
+                            <a href="{% url 'book_delete' book|get_id %}" class="text-red-500 hover:underline">Delete</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <a href="{% url 'book_create' %}" class="mt-4 inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300">Add new book</a>
+</div>
 {% endblock %}

@@ -17,7 +17,7 @@ def get_all_sales():
 
 def sales_list(request):
     sales = list(sales_collection.find())
-    return render(request, 'sales/sales_list.html', {'sales': sales})
+    return render(request, 'sales/sale_list.html', {'sales': sales})
 
 def sale_detail(request, pk):
     data = sales_collection.find_one({"_id": ObjectId(pk)})

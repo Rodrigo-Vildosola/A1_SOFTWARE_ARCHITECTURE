@@ -22,10 +22,6 @@
             <input required type="date" id="date_of_publication" name="date_of_publication" value="{% if book %}{{ book.date_of_publication|date:'Y-m-d' }}{% endif %}" class="mt-1 p-2 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
         </div>
         <div>
-            <label for="number_of_sales" class="block text-gray-700">Number of Sales</label>
-            <input required type="number" id="number_of_sales" name="number_of_sales" value="{% if book %}{{ book.number_of_sales }}{% endif %}" class="mt-1 p-2 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-        </div>
-        <div>
             <label for="author_id" class="block text-gray-700">Author</label>
             <select required id="author_id" name="author_id" class="mt-1 p-2 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
                 {% for author in authors %}
