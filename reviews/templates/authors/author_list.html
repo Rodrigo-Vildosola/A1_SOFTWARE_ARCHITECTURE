@@ -10,17 +10,35 @@
         <table id="authorTable" class="min-w-full bg-white border border-gray-200">
             <thead>
                 <tr class="bg-gray-100">
-                    <th class="py-2 px-4"><input class="p-2 rounded-md shadow-sm border border-gray-400" type="text" id="nameFilter" onkeyup="filterTable(0)" placeholder="Search for names.."></th>
+                    <th class="py-2 px-4">
+                        <input class="p-2 rounded-md shadow-sm border border-gray-400" type="text" id="nameFilter" onkeyup="filterTable(0)" placeholder="Search for names..">
+                    </th>
                     <th class="py-2 px-4"></th>
                     <th class="py-2 px-4"></th>
                     <th class="py-2 px-4"></th>
                     <th class="py-2 px-4"></th>
                 </tr>
                 <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-                    <th class="py-3 px-6 text-left cursor-pointer" onclick="sortTable(0, 'string')">Name <span class="sort-icon">▼</span></th>
-                    <th class="py-3 px-6 text-left cursor-pointer" onclick="sortTable(1, 'int')">Number of Books <span class="sort-icon">▼</span></th>
-                    <th class="py-3 px-6 text-left cursor-pointer" onclick="sortTable(2, 'float')">Average Score <span class="sort-icon">▼</span></th>
-                    <th class="py-3 px-6 text-left cursor-pointer" onclick="sortTable(3, 'int')">Total Sales <span class="sort-icon">▼</span></th>
+                    <th class="py-3 px-6 text-left cursor-pointer">
+                        <a href="?sort_by=name&order={% if sort_by == 'name' and order == 'asc' %}desc{% else %}asc{% endif %}">
+                            Name <span class="sort-icon">{{ sort_arrows.name }}</span>
+                        </a>
+                    </th>
+                    <th class="py-3 px-6 text-left cursor-pointer">
+                        <a href="?sort_by=number_of_books&order={% if sort_by == 'number_of_books' and order == 'asc' %}desc{% else %}asc{% endif %}">
+                            Number of Books <span class="sort-icon">{{ sort_arrows.number_of_books }}</span>
+                        </a>
+                    </th>
+                    <th class="py-3 px-6 text-left cursor-pointer">
+                        <a href="?sort_by=average_score&order={% if sort_by == 'average_score' and order == 'asc' %}desc{% else %}asc{% endif %}">
+                            Average Score <span class="sort-icon">{{ sort_arrows.average_score }}</span>
+                        </a>
+                    </th>
+                    <th class="py-3 px-6 text-left cursor-pointer">
+                        <a href="?sort_by=total_sales&order={% if sort_by == 'total_sales' and order == 'asc' %}desc{% else %}asc{% endif %}">
+                            Total Sales <span class="sort-icon">{{ sort_arrows.total_sales }}</span>
+                        </a>
+                    </th>
                     <th class="py-3 px-6 text-left">Actions</th>
                 </tr>
             </thead>
@@ -52,57 +70,6 @@
 </div>
 
 <script>
-function sortTable(columnIndex, type) {
-    var table = document.getElementById("authorTable");
-    var switching = true;
-    var dir = "asc";
-    var switchcount = 0;
-    
-    while (switching) {
-        switching = false;
-        var rows = table.rows;
-        
-        for (var i = 2; i < (rows.length - 1); i++) {
-            var shouldSwitch = false;
-            var x = rows[i].getElementsByTagName("TD")[columnIndex];
-            var y = rows[i + 1].getElementsByTagName("TD")[columnIndex];
-            
-            if (dir === "asc") {
-                if (compare(x.innerHTML, y.innerHTML, type) > 0) {
-                    shouldSwitch = true;
-                    break;
-                }
-            } else if (dir === "desc") {
-                if (compare(x.innerHTML, y.innerHTML, type) < 0) {
-                    shouldSwitch = true;
-                    break;
-                }
-            }
-        }
-        
-        if (shouldSwitch) {
-            rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-            switching = true;
-            switchcount++;
-        } else {
-            if (switchcount === 0 && dir === "asc") {
-                dir = "desc";
-                switching = true;
-            }
-        }
-    }
-}
-
-function compare(a, b, type) {
-    if (type === "int") {
-        return parseInt(a) - parseInt(b);
-    } else if (type === "float") {
-        return parseFloat(a) - parseFloat(b);
-    } else {
-        return a.toLowerCase().localeCompare(b.toLowerCase());
-    }
-}
-
 function filterTable(n) {
     var input = document.getElementById("nameFilter");
     var filter = input.value.toLowerCase();

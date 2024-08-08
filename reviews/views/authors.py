@@ -15,8 +15,31 @@ books_collection = db['books']
 
 
 def author_list(request):
+    sort_by = request.GET.get('sort_by', 'name')
+    order = request.GET.get('order', 'asc')
+
     authors = get_author_with_books_reviews_sales()
-    return render(request, 'authors/author_list.html', {'authors': authors})
+
+    reverse = True if order == 'desc' else False
+
+    if sort_by == 'name':
+        authors = sorted(authors, key=lambda x: x['name'].lower() if x['name'] else '', reverse=reverse)
+    elif sort_by == 'number_of_books':
+        authors = sorted(authors, key=lambda x: x.get('number_of_books', 0), reverse=reverse)
+    elif sort_by == 'average_score':
+        authors = sorted(authors, key=lambda x: x.get('average_score', float('-inf')) if x.get('average_score') is not None else float('-inf'), reverse=reverse)
+    elif sort_by == 'total_sales':
+        authors = sorted(authors, key=lambda x: x.get('total_sales', float('-inf')) if x.get('total_sales') is not None else float('-inf'), reverse=reverse)
+
+    sort_arrows = {
+        'name': '▼' if sort_by == 'name' and order == 'asc' else '▲' if sort_by == 'name' else '',
+        'number_of_books': '▼' if sort_by == 'number_of_books' and order == 'asc' else '▲' if sort_by == 'number_of_books' else '',
+        'average_score': '▼' if sort_by == 'average_score' and order == 'asc' else '▲' if sort_by == 'average_score' else '',
+        'total_sales': '▼' if sort_by == 'total_sales' and order == 'asc' else '▲' if sort_by == 'total_sales' else '',
+    }
+
+    return render(request, 'authors/author_list.html', {'authors': authors, 'sort_by': sort_by, 'order': order, 'sort_arrows': sort_arrows})
+
 
 def author_detail(request, pk):
     author = authors_collection.find_one({"_id": ObjectId(pk)})
