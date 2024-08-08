@@ -3,6 +3,15 @@
 
 This document explains the functionality of the database seeder script. The script is used to populate the MongoDB database with fake data for testing and development purposes. It uses the `Faker` library to generate random data and `argparse` to handle command-line arguments for different seeding options.
 
+## Environment Variables
+Create a .env file in the root directory of your project with the following content:
+
+   ```bash
+    MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/<dbname>?retryWrites=true&w=majority
+    DB_NAME=<dbname>
+   ```
+Replace "username", "password", and "dbname" with your MongoDB credentials and database name.
+
 
 ## Usage
 

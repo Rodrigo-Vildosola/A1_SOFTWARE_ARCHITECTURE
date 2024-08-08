@@ -3,6 +3,7 @@ from bson.objectid import ObjectId
 from reviews.utils import authors_collection
 from reviews.queries.books import (
     get_top_rated_books,
+    get_top_selling_books,
     get_books_aggregate,
     get_book_by_id,
     get_reviews_by_book,
@@ -15,16 +16,8 @@ from reviews.queries.books import (
 
 def top_books(request):
     top_rated_books = get_top_rated_books()
-    top_selling_books = [
-        {
-            "title": "Book A",
-            "author": "Author A",
-            "total_sales": 1000000,
-            "author_total_sales": 5000000,
-            "top_5_publication_year": "Yes",
-        },
-        # ... more books
-    ]
+    top_selling_books = get_top_selling_books()
+    print(top_selling_books[0])
     context = {
         'top_rated_books': top_rated_books,
         'top_selling_books': top_selling_books,
