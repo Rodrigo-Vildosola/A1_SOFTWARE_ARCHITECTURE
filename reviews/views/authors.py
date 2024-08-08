@@ -4,10 +4,14 @@ from bson.objectid import ObjectId
 import pymongo
 from reviews.utils import get_author_with_books_reviews_sales
 from reviews.mongo import Mongo
+from reviews.queries.authors import get_books_by_author  # Import the new query function
+
 
 # MongoDB connection
 db = Mongo().database
 authors_collection = db['authors']
+books_collection = db['books']
+
 
 
 def author_list(request):
@@ -16,7 +20,8 @@ def author_list(request):
 
 def author_detail(request, pk):
     author = authors_collection.find_one({"_id": ObjectId(pk)})
-    return render(request, 'authors/author_detail.html', {'author': author})
+    books = get_books_by_author(pk)  # Fetch books by author
+    return render(request, 'authors/author_detail.html', {'author': author, 'books': books})
 
 def author_create(request):
     if request.method == "POST":
