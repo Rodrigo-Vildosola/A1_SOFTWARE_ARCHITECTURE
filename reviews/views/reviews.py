@@ -27,8 +27,8 @@ def review_create(request):
         review = {
             "book_id": ObjectId(request.POST.get('book_id')),
             "review": request.POST.get('review'),
-            "score": request.POST.get('score'),
-            "number_of_upvotes": request.POST.get('number_of_upvotes')
+            "score": int(request.POST.get('score')),
+            "number_of_upvotes": int(request.POST.get('number_of_upvotes'))
         }
         reviews_collection.insert_one(review)
         return redirect('review_list')
@@ -41,8 +41,8 @@ def review_edit(request, pk):
         updated_review = {
             "book_id": ObjectId(request.POST.get('book_id')),
             "review": request.POST.get('review'),
-            "score": request.POST.get('score'),
-            "number_of_upvotes": request.POST.get('number_of_upvotes')
+            "score": int(request.POST.get('score')),
+            "number_of_upvotes": int(request.POST.get('number_of_upvotes'))
         }
         reviews_collection.update_one({'_id': ObjectId(pk)}, {'$set': updated_review})
         return redirect('review_list')

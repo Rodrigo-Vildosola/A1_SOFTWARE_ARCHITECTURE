@@ -28,7 +28,7 @@ def sale_create(request):
         sales = {
             "book_id": ObjectId(request.POST.get('book_id')),
             "year": request.POST.get('year'),
-            "sales": request.POST.get('sales')
+            "sales": int(request.POST.get('sales'))
         }
         sales_collection.insert_one(sales)
         return redirect('sales_list')
@@ -41,7 +41,7 @@ def sale_edit(request, pk):
         updated_sales = {
             "book_id": ObjectId(request.POST.get('book_id')),
             "year": request.POST.get('year'),
-            "sales": request.POST.get('sales')
+            "sales": int(request.POST.get('sales'))
         }
         sales_collection.update_one({'_id': ObjectId(pk)}, {'$set': updated_sales})
         return redirect('sales_list')

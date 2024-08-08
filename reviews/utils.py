@@ -32,7 +32,7 @@ def get_sales_by_book(book_id):
     return list(sales)
 
 def get_author_with_books_reviews_sales():
-    authors_aggregate = authors_collection.aggregate([
+    pipeline = [
         {
             '$lookup': {
                 'from': 'books',
@@ -92,27 +92,31 @@ def get_author_with_books_reviews_sales():
                         } 
                     } 
                 },
-                'average_score': { 
-                    '$avg': { 
-                        '$ifNull': [ 
-                            { 
-                                '$map': { 
-                                    'input': '$book_reviews', 
-                                    'as': 'review', 
-                                    'in': { '$toDouble': '$$review.score' } 
-                                } 
-                            }, 
-                            None 
-                        ] 
-                    } 
+                'average_score': {
+                    '$avg': {
+                        '$avg': {
+                            '$ifNull': [
+                                {
+                                    '$map': {
+                                        'input': '$book_reviews',
+                                        'as': 'book_review',
+                                        'in': { '$toDouble': '$$book_review.score' }
+                                    }
+                                },
+                                []
+                            ]
+                        }
+                    }
                 }
             }
         },
         {
             '$sort': { 'name': 1 }  # Sort by author name
         }
-    ])
-    return list(authors_aggregate)
+    ]
+
+    # Execute the aggregation pipeline
+    return list(authors_collection.aggregate(pipeline))
 
 def get_top_rated_books_with_reviews():
     top_rated_books_aggregate = books_collection.aggregate([
