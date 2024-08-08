@@ -13,6 +13,37 @@ reviews_collection = db['reviews']
 sales_collection = db['sales']
 
 
+def top_books(request):
+    # This is where you would query your database for the required data
+    # For demonstration purposes, let's assume we have the data available
+    top_rated_books = [
+        {
+            "title": "Book 1",
+            "author": "Author 1",
+            "rating": 4.9,
+            "most_popular_review": "Amazing book!",
+            "highest_rated_review": "Best book ever.",
+            "lowest_rated_review": "Not my type.",
+        },
+        # ... more books
+    ]
+    top_selling_books = [
+        {
+            "title": "Book A",
+            "author": "Author A",
+            "total_sales": 1000000,
+            "author_total_sales": 5000000,
+            "top_5_publication_year": "Yes",
+        },
+        # ... more books
+    ]
+    context = {
+        'top_rated_books': top_rated_books,
+        'top_selling_books': top_selling_books,
+    }
+    return render(request, 'top_books.html', context)
+
+
 def book_list(request):
     books_aggregate = books_collection.aggregate([
         {

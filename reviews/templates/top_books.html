@@ -1,0 +1,61 @@
+{% extends "base_generic.html" %}
+
+{% block title %}Top Books{% endblock %}
+
+{% block content %}
+<h1 class="text-3xl font-bold mb-6 text-indigo-600">Top Books</h1>
+
+<h2 class="text-2xl font-semibold mb-4 text-indigo-600">Top 10 Rated Books of All Time</h2>
+<div class="overflow-x-auto mb-8">
+    <table class="min-w-full bg-white border border-gray-200 rounded-lg shadow-lg">
+        <thead>
+            <tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
+                <th class="py-3 px-6 text-left">Title</th>
+                <th class="py-3 px-6 text-left">Author</th>
+                <th class="py-3 px-6 text-left">Rating</th>
+                <th class="py-3 px-6 text-left">Most Popular Review</th>
+                <th class="py-3 px-6 text-left">Highest Rated Review</th>
+                <th class="py-3 px-6 text-left">Lowest Rated Review</th>
+            </tr>
+        </thead>
+        <tbody class="text-gray-600 text-sm font-light">
+            {% for book in top_rated_books %}
+                <tr class="border-b border-gray-200 hover:bg-gray-100 transition duration-200">
+                    <td class="py-3 px-6 text-left">{{ book.title }}</td>
+                    <td class="py-3 px-6 text-left">{{ book.author }}</td>
+                    <td class="py-3 px-6 text-left">{{ book.rating }}</td>
+                    <td class="py-3 px-6 text-left">{{ book.most_popular_review }}</td>
+                    <td class="py-3 px-6 text-left">{{ book.highest_rated_review }}</td>
+                    <td class="py-3 px-6 text-left">{{ book.lowest_rated_review }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<h2 class="text-2xl font-semibold mb-4 text-indigo-600">Top 50 Selling Books of All Time</h2>
+<div class="overflow-x-auto">
+    <table class="min-w-full bg-white border border-gray-200 rounded-lg shadow-lg">
+        <thead>
+            <tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
+                <th class="py-3 px-6 text-left">Title</th>
+                <th class="py-3 px-6 text-left">Author</th>
+                <th class="py-3 px-6 text-left">Total Sales</th>
+                <th class="py-3 px-6 text-left">Total Sales by Author</th>
+                <th class="py-3 px-6 text-left">Top 5 of Publication Year</th>
+            </tr>
+        </thead>
+        <tbody class="text-gray-600 text-sm font-light">
+            {% for book in top_selling_books %}
+                <tr class="border-b border-gray-200 hover:bg-gray-100 transition duration-200">
+                    <td class="py-3 px-6 text-left">{{ book.title }}</td>
+                    <td class="py-3 px-6 text-left">{{ book.author }}</td>
+                    <td class="py-3 px-6 text-left">{{ book.total_sales }}</td>
+                    <td class="py-3 px-6 text-left">{{ book.author_total_sales }}</td>
+                    <td class="py-3 px-6 text-left">{{ book.top_5_publication_year }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

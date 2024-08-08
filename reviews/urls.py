@@ -2,7 +2,7 @@ from django.urls import path
 from .views import (
     home, search_view,
     author_list, author_detail, author_create, author_edit, author_delete,
-    book_list, book_detail, book_create, book_edit, book_delete,
+    top_books, book_list, book_detail, book_create, book_edit, book_delete,
     review_list, review_detail, review_create, review_edit, review_delete,
     sales_list, sale_detail, sale_create, sale_edit, sale_delete
 )
@@ -22,6 +22,8 @@ urlpatterns = [
     path('book/<str:pk>/edit/', book_edit, name='book_edit'),
     path('book/<str:pk>/delete/', book_delete, name='book_delete'),
     path('book/<str:pk>/', book_detail, name='book_detail'),
+    path('top-books/', top_books, name='top_books'),  # Add this line
+
 
     path('reviews/', review_list, name='review_list'),
     path('review/new/', review_create, name='review_create'),

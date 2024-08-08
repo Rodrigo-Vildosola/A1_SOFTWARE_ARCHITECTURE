@@ -10,7 +10,7 @@
         <table id="authorTable" class="min-w-full bg-white border border-gray-200">
             <thead>
                 <tr class="bg-gray-100">
-                  <th class="py-2 px-4"><input type="text" id="nameFilter" onkeyup="filterTable(0)" placeholder="Search for names.."></th>
+                  <th class="py-2 px-4"><input class="p-2 rounded-md shadow-sm border border-gray-400" type="text" id="nameFilter" onkeyup="filterTable(0)" placeholder="Search for names.."></th>
                   <th class="py-2 px-4"></th>
                   <th class="py-2 px-4"></th>
                   <th class="py-2 px-4"></th>
@@ -109,17 +109,4 @@ function filterTable(n) {
 }
 </script>
 
-<style>
-.sort-icon {
-    font-size: 0.8em;
-    margin-left: 0.5em;
-}
-
-input[type="text"] {
-    width: 100%;
-    padding: 0.5em;
-    border: 1px solid #ccc;
-    border-radius: 0.25em;
-}
-</style>
 {% endblock %}
