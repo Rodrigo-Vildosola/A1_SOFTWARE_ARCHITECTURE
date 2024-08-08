@@ -7,13 +7,20 @@
 <div class="max-w-6xl mx-auto mt-6">
     <h1 class="text-3xl font-bold mb-4 text-indigo-600">Authors</h1>
     <div class="overflow-x-auto">
-        <table class="min-w-full bg-white border border-gray-200">
+        <table id="authorTable" class="min-w-full bg-white border border-gray-200">
             <thead>
+                <tr class="bg-gray-100">
+                  <th class="py-2 px-4"><input type="text" id="nameFilter" onkeyup="filterTable(0)" placeholder="Search for names.."></th>
+                  <th class="py-2 px-4"></th>
+                  <th class="py-2 px-4"></th>
+                  <th class="py-2 px-4"></th>
+                  <th class="py-2 px-4"></th>
+                </tr>
                 <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-                    <th class="py-3 px-6 text-left">Name</th>
-                    <th class="py-3 px-6 text-left">Number of Books</th>
-                    <th class="py-3 px-6 text-left">Average Score</th>
-                    <th class="py-3 px-6 text-left">Total Sales</th>
+                    <th class="py-3 px-6 text-left cursor-pointer" onclick="sortTable(0)">Name <span class="sort-icon">▼</span></th>
+                    <th class="py-3 px-6 text-left cursor-pointer" onclick="sortTable(1)">Number of Books <span class="sort-icon">▼</span></th>
+                    <th class="py-3 px-6 text-left cursor-pointer" onclick="sortTable(2)">Average Score <span class="sort-icon">▼</span></th>
+                    <th class="py-3 px-6 text-left cursor-pointer" onclick="sortTable(3)">Total Sales <span class="sort-icon">▼</span></th>
                     <th class="py-3 px-6 text-left">Actions</th>
                 </tr>
             </thead>
@@ -27,7 +34,7 @@
                             {{ author.number_of_books }}
                         </td>
                         <td class="py-3 px-6 text-left">
-                            {{ author.average_score|default:"N/A" }}
+                            {{ author.average_score|floatformat:2|default:"N/A" }}
                         </td>
                         <td class="py-3 px-6 text-left">
                             {{ author.total_sales|default:"N/A" }}
@@ -43,4 +50,76 @@
     </div>
     <a href="{% url 'author_create' %}" class="mt-4 inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300">Add new author</a>
 </div>
+
+<script>
+function sortTable(n) {
+    var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+    table = document.getElementById("authorTable");
+    switching = true;
+    dir = "asc"; 
+    while (switching) {
+        switching = false;
+        rows = table.rows;
+        for (i = 2; i < (rows.length - 1); i++) {
+            shouldSwitch = false;
+            x = rows[i].getElementsByTagName("TD")[n];
+            y = rows[i + 1].getElementsByTagName("TD")[n];
+            if (dir == "asc") {
+                if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                    shouldSwitch = true;
+                    break;
+                }
+            } else if (dir == "desc") {
+                if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                    shouldSwitch = true;
+                    break;
+                }
+            }
+        }
+        if (shouldSwitch) {
+            rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+            switching = true;
+            switchcount++;
+        } else {
+            if (switchcount == 0 && dir == "asc") {
+                dir = "desc";
+                switching = true;
+            }
+        }
+    }
+}
+
+function filterTable(n) {
+    var input, filter, table, tr, td, i, txtValue;
+    input = document.getElementById("nameFilter");
+    filter = input.value.toLowerCase();
+    table = document.getElementById("authorTable");
+    tr = table.getElementsByTagName("tr");
+    for (i = 2; i < tr.length; i++) {
+        td = tr[i].getElementsByTagName("td")[n];
+        if (td) {
+            txtValue = td.textContent || td.innerText;
+            if (txtValue.toLowerCase().indexOf(filter) > -1) {
+                tr[i].style.display = "";
+            } else {
+                tr[i].style.display = "none";
+            }
+        }
+    }
+}
+</script>
+
+<style>
+.sort-icon {
+    font-size: 0.8em;
+    margin-left: 0.5em;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 0.5em;
+    border: 1px solid #ccc;
+    border-radius: 0.25em;
+}
+</style>
 {% endblock %}
