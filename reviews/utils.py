@@ -34,48 +34,82 @@ def get_sales_by_book(book_id):
 def get_author_with_books_reviews_sales():
     authors_aggregate = authors_collection.aggregate([
         {
-            "$lookup": {
-                "from": "books",
-                "localField": "_id",
-                "foreignField": "author_id",
-                "as": "books"
+            '$lookup': {
+                'from': 'books',
+                'localField': '_id',
+                'foreignField': 'author_id',
+                'as': 'author_books'
             }
         },
         {
-            "$unwind": {
-                "path": "$books",
-                "preserveNullAndEmptyArrays": True
+            '$addFields': {
+                'number_of_books': { '$size': '$author_books' }
             }
         },
         {
-            "$lookup": {
-                "from": "reviews",
-                "localField": "books._id",
-                "foreignField": "book_id",
-                "as": "reviews"
+            '$unwind': {
+                'path': '$author_books',
+                'preserveNullAndEmptyArrays': True
             }
         },
         {
-            "$lookup": {
-                "from": "sales",
-                "localField": "books._id",
-                "foreignField": "book_id",
-                "as": "sales"
+            '$lookup': {
+                'from': 'sales',
+                'localField': 'author_books._id',
+                'foreignField': 'book_id',
+                'as': 'book_sales'
             }
         },
         {
-            "$group": {
-                "_id": "$_id",
-                "name": { "$first": "$name" },
-                "number_of_books": { "$sum": { "$cond": [{ "$ifNull": ["$books._id", False] }, 1, 0] } },
-                "average_score": { "$avg": "$reviews.score" },
-                "total_sales": { "$sum": "$sales.sales" }
+            '$lookup': {
+                'from': 'reviews',
+                'localField': 'author_books._id',
+                'foreignField': 'book_id',
+                'as': 'book_reviews'
             }
         },
         {
-            "$addFields": {
-                "id": { "$toString": "$_id" }
+            '$group': {
+                '_id': '$_id',
+                'name': { '$first': '$name' },
+                'date_of_birth': { '$first': '$date_of_birth' },
+                'country_of_origin': { '$first': '$country_of_origin' },
+                'short_description': { '$first': '$short_description' },
+                'number_of_books': { '$first': '$number_of_books' },
+                'total_sales': { 
+                    '$sum': { 
+                        '$sum': { 
+                            '$ifNull': [ 
+                                { 
+                                    '$map': { 
+                                        'input': '$book_sales', 
+                                        'as': 'sale', 
+                                        'in': { '$toInt': '$$sale.sales' } 
+                                    } 
+                                }, 
+                                0 
+                            ] 
+                        } 
+                    } 
+                },
+                'average_score': { 
+                    '$avg': { 
+                        '$ifNull': [ 
+                            { 
+                                '$map': { 
+                                    'input': '$book_reviews', 
+                                    'as': 'review', 
+                                    'in': { '$toDouble': '$$review.score' } 
+                                } 
+                            }, 
+                            None 
+                        ] 
+                    } 
+                }
             }
+        },
+        {
+            '$sort': { 'name': 1 }  # Sort by author name
         }
     ])
     return list(authors_aggregate)

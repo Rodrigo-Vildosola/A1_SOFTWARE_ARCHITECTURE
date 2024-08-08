@@ -20,21 +20,23 @@ def book_list(request):
                 "from": "sales",
                 "localField": "_id",
                 "foreignField": "book_id",
-                "as": "sales"
+                "as": "book_sales"
             }
         },
         {
-            "$addFields": {
-                "number_of_sales": { "$sum": "$sales.sales" }
+            '$unwind': {
+                'path': '$book_sales',
+                'preserveNullAndEmptyArrays': True
             }
         },
         {
-            "$project": {
-                "name": 1,
-                "summary": 1,
-                "date_of_publication": 1,
-                "author_id": 1,
-                "number_of_sales": 1
+            "$group": {
+                "_id": "$_id",
+                "name": { "$first": "$name" },
+                "summary": { "$first": "$summary" },
+                "date_of_publication": { "$first": "$date_of_publication" },
+                "author_id": { "$first": "$author_id" },
+                "number_of_sales": { '$sum': { '$toInt': '$book_sales.sales' } }
             }
         }
     ])
