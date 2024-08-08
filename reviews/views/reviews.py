@@ -1,26 +1,16 @@
 from django.shortcuts import render, redirect
+from reviews.utils import reviews_collection, books_collection
 from bson.objectid import ObjectId
-from reviews.utils import get_all
-from reviews.mongo import Mongo
+from reviews.queries.reviews import get_all_reviews, get_review_by_id
 
-# MongoDB connection
-db = Mongo().database
-reviews_collection = db['reviews']
-books_collection = db['books']
-
-def get_all_reviews():
-    reviews = []
-    for data in reviews_collection.find():
-        reviews.append(data)
-    return reviews
 
 def review_list(request):
-    reviews = list(reviews_collection.find())
+    reviews = get_all_reviews()
     return render(request, 'reviews/review_list.html', {'reviews': reviews})
 
 def review_detail(request, pk):
-    data = reviews_collection.find_one({"_id": ObjectId(pk)})
-    return render(request, 'reviews/review_detail.html', {'review': data})
+    review = get_review_by_id(pk)
+    return render(request, 'reviews/review_detail.html', {'review': review})
 
 def review_create(request):
     if request.method == "POST":
@@ -36,7 +26,7 @@ def review_create(request):
     return render(request, 'reviews/review_form.html', {'books': books})
 
 def review_edit(request, pk):
-    data = reviews_collection.find_one({"_id": ObjectId(pk)})
+    review = get_review_by_id(pk)
     if request.method == "POST":
         updated_review = {
             "book_id": ObjectId(request.POST.get('book_id')),
@@ -47,11 +37,11 @@ def review_edit(request, pk):
         reviews_collection.update_one({'_id': ObjectId(pk)}, {'$set': updated_review})
         return redirect('review_list')
     books = list(books_collection.find())
-    return render(request, 'reviews/review_form.html', {'review': data, 'books': books})
+    return render(request, 'reviews/review_form.html', {'review': review, 'books': books})
 
 def review_delete(request, pk):
-    data = reviews_collection.find_one({"_id": ObjectId(pk)})
+    review = get_review_by_id(pk)
     if request.method == "POST":
         reviews_collection.delete_one({'_id': ObjectId(pk)})
         return redirect('review_list')
-    return render(request, 'reviews/review_confirm_delete.html', {'review': data})
+    return render(request, 'reviews/review_confirm_delete.html', {'review': review})

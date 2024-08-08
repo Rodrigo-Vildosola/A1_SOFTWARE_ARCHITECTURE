@@ -1,56 +1,44 @@
 from django.shortcuts import render, redirect
+from reviews.utils import sales_collection, books_collection
 from bson.objectid import ObjectId
-from reviews.utils import get_all
-from reviews.mongo import Mongo
-
-# MongoDB connection
-db = Mongo().database
-sales_collection = db['sales']
-books_collection = db['books']
-
-def get_all_sales():
-    sales = []
-    for data in sales_collection.find():
-        data['id'] = str(data['_id'])
-        sales.append(data)
-    return sales
+from reviews.queries.sales import get_all_sales, get_sale_by_id
 
 def sales_list(request):
-    sales = list(sales_collection.find())
+    sales = get_all_sales()
     return render(request, 'sales/sale_list.html', {'sales': sales})
 
 def sale_detail(request, pk):
-    data = sales_collection.find_one({"_id": ObjectId(pk)})
-    return render(request, 'sales/sale_detail.html', {'sales': data})
+    sale = get_sale_by_id(pk)
+    return render(request, 'sales/sale_detail.html', {'sale': sale})
 
 def sale_create(request):
     if request.method == "POST":
-        sales = {
+        sale = {
             "book_id": ObjectId(request.POST.get('book_id')),
             "year": request.POST.get('year'),
             "sales": int(request.POST.get('sales'))
         }
-        sales_collection.insert_one(sales)
+        sales_collection.insert_one(sale)
         return redirect('sales_list')
     books = list(books_collection.find())
     return render(request, 'sales/sale_form.html', {'books': books})
 
 def sale_edit(request, pk):
-    data = sales_collection.find_one({"_id": ObjectId(pk)})
+    sale = get_sale_by_id(pk)
     if request.method == "POST":
-        updated_sales = {
+        updated_sale = {
             "book_id": ObjectId(request.POST.get('book_id')),
             "year": request.POST.get('year'),
             "sales": int(request.POST.get('sales'))
         }
-        sales_collection.update_one({'_id': ObjectId(pk)}, {'$set': updated_sales})
+        sales_collection.update_one({'_id': ObjectId(pk)}, {'$set': updated_sale})
         return redirect('sales_list')
     books = list(books_collection.find())
-    return render(request, 'sales/sale_form.html', {'sales': data, 'books': books})
+    return render(request, 'sales/sale_form.html', {'sale': sale, 'books': books})
 
 def sale_delete(request, pk):
-    data = sales_collection.find_one({"_id": ObjectId(pk)})
+    sale = get_sale_by_id(pk)
     if request.method == "POST":
         sales_collection.delete_one({'_id': ObjectId(pk)})
         return redirect('sales_list')
-    return render(request, 'sales/sale_confirm_delete.html', {'sales': data})
+    return render(request, 'sales/sale_confirm_delete.html', {'sale': sale})
