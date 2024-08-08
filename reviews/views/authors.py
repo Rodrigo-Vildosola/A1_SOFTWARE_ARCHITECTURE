@@ -4,7 +4,7 @@ from bson.objectid import ObjectId
 import pymongo
 from reviews.utils import get_author_with_books_reviews_sales
 from reviews.mongo import Mongo
-from reviews.queries.authors import get_books_by_author  # Import the new query function
+from reviews.queries.authors import get_books_by_author 
 
 
 # MongoDB connection
