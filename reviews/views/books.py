@@ -34,7 +34,7 @@ def book_create(request):
         }
         books_collection.insert_one(book)
         return redirect('book_list')
-    authors = list(books_collection.find())
+    authors = list(authors_collection.find())
     return render(request, 'books/book_form.html', {'authors': authors})
 
 def book_edit(request, pk):

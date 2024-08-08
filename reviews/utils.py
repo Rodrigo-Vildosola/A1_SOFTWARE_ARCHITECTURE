@@ -103,11 +103,6 @@ def get_top_rated_books_with_reviews():
         },
         {
             "$limit": 10
-        },
-        {
-            "$project": {
-                "_id": 0
-            }
         }
     ])
     return list(top_rated_books_aggregate)
@@ -168,22 +163,16 @@ def get_top_selling_books():
         },
         {
             "$limit": 50
-        },
-        {
-            "$project": {
-                "_id": 0
-            }
         }
     ])
     return list(top_selling_books_aggregate)
 
 def search_books(query, page=1, limit=10):
     skip = (page - 1) * limit
+    regex_query = {"$regex": query, "$options": "i"}  # Case-insensitive regex
+
     search_results = books_collection.find(
-        { "$text": { "$search": query } },
-        { "score": { "$meta": "textScore" } }
-    ).sort(
-        [("score", { "$meta": "textScore" })]
+        { "$or": [ {"name": regex_query}, {"summary": regex_query} ] }
     ).skip(skip).limit(limit)
     
     books = []
@@ -192,3 +181,4 @@ def search_books(query, page=1, limit=10):
         books.append(book)
     
     return books
+

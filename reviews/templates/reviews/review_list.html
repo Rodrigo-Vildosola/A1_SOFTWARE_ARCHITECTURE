@@ -1,0 +1,40 @@
+{% extends "base_generic.html" %}
+{% load custom_filters %}
+
+
+{% block title %}Reviews{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto mt-6">
+    <h1 class="text-3xl font-bold mb-4 text-indigo-600">Reviews</h1>
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-white border border-gray-200">
+            <thead>
+                <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+                    <th class="py-3 px-6 text-left">Book</th>
+                    <th class="py-3 px-6 text-left">Review</th>
+                    <th class="py-3 px-6 text-left">Score</th>
+                    <th class="py-3 px-6 text-left">Upvotes</th>
+                    <th class="py-3 px-6 text-left">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="text-gray-600 text-sm font-light">
+                {% for review in reviews %}
+                    <tr class="border-b border-gray-200 hover:bg-gray-100">
+                        <td class="py-3 px-6 text-left">{{ review.book_id }}</td>
+                        <td class="py-3 px-6 text-left">{{ review.review }}</td>
+                        <td class="py-3 px-6 text-left">{{ review.score }}</td>
+                        <td class="py-3 px-6 text-left">{{ review.number_of_upvotes }}</td>
+                        <td class="py-3 px-6 text-left">
+                            <a href="{% url 'review_detail' review|get_id %}" class="text-blue-500 hover:underline">View</a> |
+                            <a href="{% url 'review_edit' review|get_id %}" class="text-yellow-500 hover:underline">Edit</a> |
+                            <a href="{% url 'review_delete' review|get_id %}" class="text-red-500 hover:underline">Delete</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <a href="{% url 'review_create' %}" class="mt-4 inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300">Add new review</a>
+</div>
+{% endblock %}

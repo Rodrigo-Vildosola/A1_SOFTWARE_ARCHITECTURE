@@ -8,6 +8,7 @@ class Mongo:
         if cls._instance is None:
             cls._instance = super(Mongo, cls).__new__(cls)
             cls._instance.client = MongoClient(config('MONGODB_URI'))
+            print(cls._instance.client)
             cls._instance.db = cls._instance.client[config('DB_NAME')]
         return cls._instance
 
