@@ -10,17 +10,17 @@
         <table id="authorTable" class="min-w-full bg-white border border-gray-200">
             <thead>
                 <tr class="bg-gray-100">
-                  <th class="py-2 px-4"><input class="p-2 rounded-md shadow-sm border border-gray-400" type="text" id="nameFilter" onkeyup="filterTable(0)" placeholder="Search for names.."></th>
-                  <th class="py-2 px-4"></th>
-                  <th class="py-2 px-4"></th>
-                  <th class="py-2 px-4"></th>
-                  <th class="py-2 px-4"></th>
+                    <th class="py-2 px-4"><input class="p-2 rounded-md shadow-sm border border-gray-400" type="text" id="nameFilter" onkeyup="filterTable(0)" placeholder="Search for names.."></th>
+                    <th class="py-2 px-4"></th>
+                    <th class="py-2 px-4"></th>
+                    <th class="py-2 px-4"></th>
+                    <th class="py-2 px-4"></th>
                 </tr>
                 <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-                    <th class="py-3 px-6 text-left cursor-pointer" onclick="sortTable(0)">Name <span class="sort-icon">▼</span></th>
-                    <th class="py-3 px-6 text-left cursor-pointer" onclick="sortTable(1)">Number of Books <span class="sort-icon">▼</span></th>
-                    <th class="py-3 px-6 text-left cursor-pointer" onclick="sortTable(2)">Average Score <span class="sort-icon">▼</span></th>
-                    <th class="py-3 px-6 text-left cursor-pointer" onclick="sortTable(3)">Total Sales <span class="sort-icon">▼</span></th>
+                    <th class="py-3 px-6 text-left cursor-pointer" onclick="sortTable(0, 'string')">Name <span class="sort-icon">▼</span></th>
+                    <th class="py-3 px-6 text-left cursor-pointer" onclick="sortTable(1, 'int')">Number of Books <span class="sort-icon">▼</span></th>
+                    <th class="py-3 px-6 text-left cursor-pointer" onclick="sortTable(2, 'float')">Average Score <span class="sort-icon">▼</span></th>
+                    <th class="py-3 px-6 text-left cursor-pointer" onclick="sortTable(3, 'int')">Total Sales <span class="sort-icon">▼</span></th>
                     <th class="py-3 px-6 text-left">Actions</th>
                 </tr>
             </thead>
@@ -52,36 +52,40 @@
 </div>
 
 <script>
-function sortTable(n) {
-    var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
-    table = document.getElementById("authorTable");
-    switching = true;
-    dir = "asc"; 
+function sortTable(columnIndex, type) {
+    var table = document.getElementById("authorTable");
+    var switching = true;
+    var dir = "asc";
+    var switchcount = 0;
+    
     while (switching) {
         switching = false;
-        rows = table.rows;
-        for (i = 2; i < (rows.length - 1); i++) {
-            shouldSwitch = false;
-            x = rows[i].getElementsByTagName("TD")[n];
-            y = rows[i + 1].getElementsByTagName("TD")[n];
-            if (dir == "asc") {
-                if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+        var rows = table.rows;
+        
+        for (var i = 2; i < (rows.length - 1); i++) {
+            var shouldSwitch = false;
+            var x = rows[i].getElementsByTagName("TD")[columnIndex];
+            var y = rows[i + 1].getElementsByTagName("TD")[columnIndex];
+            
+            if (dir === "asc") {
+                if (compare(x.innerHTML, y.innerHTML, type) > 0) {
                     shouldSwitch = true;
                     break;
                 }
-            } else if (dir == "desc") {
-                if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+            } else if (dir === "desc") {
+                if (compare(x.innerHTML, y.innerHTML, type) < 0) {
                     shouldSwitch = true;
                     break;
                 }
             }
         }
+        
         if (shouldSwitch) {
             rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
             switching = true;
             switchcount++;
         } else {
-            if (switchcount == 0 && dir == "asc") {
+            if (switchcount === 0 && dir === "asc") {
                 dir = "desc";
                 switching = true;
             }
@@ -89,16 +93,26 @@ function sortTable(n) {
     }
 }
 
+function compare(a, b, type) {
+    if (type === "int") {
+        return parseInt(a) - parseInt(b);
+    } else if (type === "float") {
+        return parseFloat(a) - parseFloat(b);
+    } else {
+        return a.toLowerCase().localeCompare(b.toLowerCase());
+    }
+}
+
 function filterTable(n) {
-    var input, filter, table, tr, td, i, txtValue;
-    input = document.getElementById("nameFilter");
-    filter = input.value.toLowerCase();
-    table = document.getElementById("authorTable");
-    tr = table.getElementsByTagName("tr");
-    for (i = 2; i < tr.length; i++) {
-        td = tr[i].getElementsByTagName("td")[n];
+    var input = document.getElementById("nameFilter");
+    var filter = input.value.toLowerCase();
+    var table = document.getElementById("authorTable");
+    var tr = table.getElementsByTagName("tr");
+    
+    for (var i = 2; i < tr.length; i++) {
+        var td = tr[i].getElementsByTagName("td")[n];
         if (td) {
-            txtValue = td.textContent || td.innerText;
+            var txtValue = td.textContent || td.innerText;
             if (txtValue.toLowerCase().indexOf(filter) > -1) {
                 tr[i].style.display = "";
             } else {
