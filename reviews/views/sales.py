@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
-from reviews.utils import sales_collection, books_collection
 from bson.objectid import ObjectId
-from reviews.queries.sales import get_all_sales, get_sale_by_id
+from reviews.queries.sales import get_all_sales, get_sale_by_id, create_sale, update_sale, delete_sale
+from reviews.utils import authors_collection
 
 def sales_list(request):
     sales = get_all_sales()
@@ -13,32 +13,41 @@ def sale_detail(request, pk):
 
 def sale_create(request):
     if request.method == "POST":
+        book_id = ObjectId(request.POST.get('book_id'))
         sale = {
-            "book_id": ObjectId(request.POST.get('book_id')),
-            "year": request.POST.get('year'),
+            "year": int(request.POST.get('year')),
             "sales": int(request.POST.get('sales'))
         }
-        sales_collection.insert_one(sale)
+        create_sale(book_id, sale)
         return redirect('sales_list')
-    books = list(books_collection.find())
+    
+    # Fetch only necessary fields (name and id) to avoid loading too much data
+    books = list(authors_collection.aggregate([
+        {"$unwind": "$books"},
+        {"$project": {"_id": "$books._id", "name": "$books.name"}}
+    ]))
     return render(request, 'sales/sale_form.html', {'books': books})
 
 def sale_edit(request, pk):
     sale = get_sale_by_id(pk)
     if request.method == "POST":
         updated_sale = {
-            "book_id": ObjectId(request.POST.get('book_id')),
-            "year": request.POST.get('year'),
+            "year": int(request.POST.get('year')),
             "sales": int(request.POST.get('sales'))
         }
-        sales_collection.update_one({'_id': ObjectId(pk)}, {'$set': updated_sale})
+        update_sale(pk, updated_sale)
         return redirect('sales_list')
-    books = list(books_collection.find())
+    
+    # Fetch only necessary fields (name and id) to avoid loading too much data
+    books = list(authors_collection.aggregate([
+        {"$unwind": "$books"},
+        {"$project": {"_id": "$books._id", "name": "$books.name"}}
+    ]))
     return render(request, 'sales/sale_form.html', {'sale': sale, 'books': books})
 
 def sale_delete(request, pk):
     sale = get_sale_by_id(pk)
     if request.method == "POST":
-        sales_collection.delete_one({'_id': ObjectId(pk)})
+        delete_sale(pk)
         return redirect('sales_list')
     return render(request, 'sales/sale_confirm_delete.html', {'sale': sale})

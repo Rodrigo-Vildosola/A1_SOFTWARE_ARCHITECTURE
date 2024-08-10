@@ -3,31 +3,23 @@ from reviews.mongo import Mongo
 
 # MongoDB connection
 db = Mongo().database
-books_collection = db['books']
-authors_collection = db['authors']
-reviews_collection = db['reviews']
-sales_collection = db['sales']
+authors_collection = db['object']
 
 def get_top_rated_books():
     pipeline = [
         {
-            "$lookup": {
-                "from": "reviews",
-                "localField": "_id",
-                "foreignField": "book_id",
-                "as": "book_reviews"
-            }
+            "$unwind": "$books"
         },
         {
-            "$unwind": "$book_reviews"
+            "$unwind": "$books.reviews"
         },
         {
             "$group": {
-                "_id": "$_id",
-                "title": { "$first": "$name" },
-                "author_id": { "$first": "$author_id" },
-                "average_rating": { "$avg": { "$toDouble": "$book_reviews.score" } },
-                "reviews": { "$push": "$book_reviews" }
+                "_id": "$books._id",
+                "title": { "$first": "$books.name" },
+                "author_id": { "$first": "$_id" },
+                "average_rating": { "$avg": { "$toDouble": "$books.reviews.score" } },
+                "reviews": { "$push": "$books.reviews" }
             }
         },
         {
@@ -75,31 +67,27 @@ def get_top_rated_books():
         }
     ]
 
-    return list(books_collection.aggregate(pipeline))
+    return list(authors_collection.aggregate(pipeline))
+
 
 def get_top_selling_books():
     pipeline = [
         {
-            "$lookup": {
-                "from": "sales",
-                "localField": "_id",
-                "foreignField": "book_id",
-                "as": "book_sales"
-            }
+            "$unwind": "$books"
         },
         {
             "$unwind": {
-                "path": "$book_sales",
+                "path": "$books.sales",
                 "preserveNullAndEmptyArrays": True
             }
         },
         {
             "$group": {
-                "_id": "$_id",
-                "title": {"$first": "$name"},
-                "author_id": {"$first": "$author_id"},
-                "total_sales": {"$sum": {"$convert": {"input": "$book_sales.sales", "to": "int", "onError": 0, "onNull": 0}}},
-                "publication_year": {"$first": {"$year": {"$dateFromString": {"dateString": "$date_of_publication"}}}}
+                "_id": "$books._id",
+                "title": {"$first": "$books.name"},
+                "author_id": {"$first": "$_id"},
+                "total_sales": {"$sum": {"$convert": {"input": "$books.sales.sales", "to": "int", "onError": 0, "onNull": 0}}},
+                "publication_year": {"$first": {"$year": {"$dateFromString": {"dateString": "$books.date_of_publication"}}}}
             }
         },
         {
@@ -120,21 +108,12 @@ def get_top_selling_books():
             "$unwind": "$author_info"
         },
         {
-            "$lookup": {
-                "from": "sales",
-                "localField": "author_id",
-                "foreignField": "book_id",
-                "as": "author_sales"
-            }
-        },
-        {
             "$group": {
                 "_id": "$_id",
                 "title": {"$first": "$title"},
                 "author": {"$first": "$author_info.name"},
                 "author_id": {"$first": "$author_info._id"},
                 "total_sales": {"$first": "$total_sales"},
-                "author_total_sales": {"$sum": {"$convert": {"input": "$author_sales.sales", "to": "int", "onError": 0, "onNull": 0}}},
                 "publication_year": {"$first": "$publication_year"},
                 "is_top_5_publication_year": {
                     "$first": {
@@ -153,63 +132,122 @@ def get_top_selling_books():
                 "author": 1,
                 "author_id": 1,
                 "total_sales": 1,
-                "author_total_sales": 1,
                 "is_top_5_publication_year": 1
             }
         }
     ]
 
-    return list(books_collection.aggregate(pipeline))
+    return list(authors_collection.aggregate(pipeline))
 
 
 def get_books_aggregate():
     pipeline = [
         {
-            "$lookup": {
-                "from": "sales",
-                "localField": "_id",
-                "foreignField": "book_id",
-                "as": "book_sales"
-            }
+            "$unwind": "$books"
         },
         {
             '$unwind': {
-                'path': '$book_sales',
+                'path': '$books.sales',
                 'preserveNullAndEmptyArrays': True
             }
         },
         {
             "$group": {
-                "_id": "$_id",
-                "name": { "$first": "$name" },
-                "summary": { "$first": "$summary" },
-                "date_of_publication": { "$first": "$date_of_publication" },
-                "author_id": { "$first": "$author_id" },
-                "number_of_sales": { '$sum': { '$toInt': '$book_sales.sales' } }
+                "_id": "$books._id",
+                "name": { "$first": "$books.name" },
+                "summary": { "$first": "$books.summary" },
+                "date_of_publication": { "$first": "$books.date_of_publication" },
+                "author_id": { "$first": "$_id" },
+                "number_of_sales": { '$sum': { '$toInt': '$books.sales.sales' } }
             }
         }
     ]
-    return list(books_collection.aggregate(pipeline))
+    return list(authors_collection.aggregate(pipeline))
+
 
 def get_book_by_id(pk):
-    book = books_collection.find_one({"_id": ObjectId(pk)})
-    if book:
-        author = authors_collection.find_one({"_id": book["author_id"]}, {"_id": 1, "name": 1})
-        if author:
-            book["author"] = {"id": str(author["_id"]), "name": author["name"]}
-    return book
+    pipeline = [
+        {
+            "$unwind": "$books"
+        },
+        {
+            "$match": { "books._id": ObjectId(pk) }
+        },
+        {
+            "$project": {
+                "_id": "$books._id",
+                "name": "$books.name",
+                "summary": "$books.summary",
+                "date_of_publication": "$books.date_of_publication",
+                "author_id": "$_id",
+                "author_name": "$name"
+            }
+        }
+    ]
+    book = list(authors_collection.aggregate(pipeline))
+    return book[0] if book else None
+
 
 def get_reviews_by_book(pk):
-    return list(reviews_collection.find({"book_id": ObjectId(pk)}))
+    pipeline = [
+        {
+            "$unwind": "$books"
+        },
+        {
+            "$match": { "books._id": ObjectId(pk) }
+        },
+        {
+            "$unwind": "$books.reviews"
+        },
+        {
+            "$project": {
+                "_id": "$books.reviews._id",
+                "review": "$books.reviews.review",
+                "score": "$books.reviews.score",
+                "number_of_upvotes": "$books.reviews.number_of_upvotes",
+                "book_id": "$books._id"
+            }
+        }
+    ]
+    return list(authors_collection.aggregate(pipeline))
 
 def get_sales_by_book(pk):
-    return list(sales_collection.find({"book_id": ObjectId(pk)}))
+    pipeline = [
+        {
+            "$unwind": "$books"
+        },
+        {
+            "$match": { "books._id": ObjectId(pk) }
+        },
+        {
+            "$unwind": "$books.sales"
+        },
+        {
+            "$project": {
+                "_id": "$books.sales._id",
+                "year": "$books.sales.year",
+                "sales": "$books.sales.sales",
+                "book_id": "$books._id"
+            }
+        }
+    ]
+    return list(authors_collection.aggregate(pipeline))
 
-def create_book(data):
-    return books_collection.insert_one(data)
+def create_book(author_id, book_data):
+    book_data["_id"] = ObjectId()
+    return authors_collection.update_one(
+        {'_id': ObjectId(author_id)},
+        {'$push': {'books': book_data}}
+    )
 
 def update_book(pk, data):
-    return books_collection.update_one({'_id': ObjectId(pk)}, {'$set': data})
+    return authors_collection.update_one(
+        {'books._id': ObjectId(pk)},
+        {'$set': {f'books.$.{key}': value for key, value in data.items()}}
+    )
 
 def delete_book(pk):
-    return books_collection.delete_one({'_id': ObjectId(pk)})
+    return authors_collection.update_one(
+        {'books._id': ObjectId(pk)},
+        {'$pull': {'books': {'_id': ObjectId(pk)}}}
+    )

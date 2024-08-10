@@ -12,7 +12,7 @@
         <p class="text-gray-700 mb-2"><strong>Number of Sales:</strong> {{ book.number_of_sales }}</p>
         <p class="text-gray-700 mb-2">
             <strong>Author:</strong> 
-            <a href="{% url 'author_detail' book.author.id %}" class="text-indigo-600 hover:underline">{{ book.author.name }}</a>
+            <a href="{% url 'author_detail' book.author_id %}" class="text-indigo-600 hover:underline">{{ book.author_name }}</a>
         </p>
     </div>
 

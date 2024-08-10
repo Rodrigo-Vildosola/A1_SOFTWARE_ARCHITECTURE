@@ -1,18 +1,11 @@
 from django.shortcuts import render, redirect
-from decouple import config
 from bson.objectid import ObjectId
-import pymongo
-from reviews.utils import get_author_with_books_reviews_sales
+from reviews.queries.authors import get_author_with_books_reviews_sales, get_books_by_author
 from reviews.mongo import Mongo
-from reviews.queries.authors import get_books_by_author 
-
 
 # MongoDB connection
 db = Mongo().database
-authors_collection = db['authors']
-books_collection = db['books']
-
-
+authors_collection = db.object
 
 def author_list(request):
     sort_by = request.GET.get('sort_by', 'name')
@@ -39,7 +32,6 @@ def author_list(request):
     }
 
     return render(request, 'authors/author_list.html', {'authors': authors, 'sort_by': sort_by, 'order': order, 'sort_arrows': sort_arrows})
-
 
 def author_detail(request, pk):
     author = authors_collection.find_one({"_id": ObjectId(pk)})

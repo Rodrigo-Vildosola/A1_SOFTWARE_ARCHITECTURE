@@ -1,61 +1,95 @@
-from bson.objectid import ObjectId
 from reviews.mongo import Mongo
+from bson.objectid import ObjectId
+from pymongo.errors import PyMongoError
 
+# Initialize database and collection
 db = Mongo().database
-reviews_collection = db['reviews']
-books_collection = db['books']
+authors_collection = db['object']
 
 def get_all_reviews():
-    pipeline = [
-        {
-            "$lookup": {
-                "from": "books",
-                "localField": "book_id",
-                "foreignField": "_id",
-                "as": "book_info"
+    try:
+        pipeline = [
+            {"$unwind": "$books"},
+            {"$unwind": "$books.reviews"},
+            {
+                "$project": {
+                    "_id": "$books.reviews._id",
+                    "author_name": "$name",
+                    "book_id": "$books._id",
+                    "book_name": "$books.name",
+                    "review": "$books.reviews.review",
+                    "score": "$books.reviews.score",
+                    "number_of_upvotes": "$books.reviews.number_of_upvotes"
+                }
             }
-        },
-        {
-            "$unwind": "$book_info"
-        },
-        {
-            "$project": {
-                "_id": 1,
-                "book_id": 1,
-                "review": 1,
-                "score": 1,
-                "number_of_upvotes": 1,
-                "book_name": "$book_info.name"
-            }
-        }
-    ]
-    return list(reviews_collection.aggregate(pipeline))
+        ]
+        return list(authors_collection.aggregate(pipeline))
+    except PyMongoError as e:
+        print(f"An error occurred: {e}")
+        return []
 
 def get_review_by_id(review_id):
-    pipeline = [
-        {
-            "$match": { "_id": ObjectId(review_id) }
-        },
-        {
-            "$lookup": {
-                "from": "books",
-                "localField": "book_id",
-                "foreignField": "_id",
-                "as": "book_info"
+    try:
+        review_id = ObjectId(review_id)
+        pipeline = [
+            {"$unwind": "$books"},
+            {"$unwind": "$books.reviews"},
+            {"$match": {"books.reviews._id": review_id}},
+            {
+                "$project": {
+                    "author_name": "$name",
+                    "book_name": "$books.name",
+                    "book_id": "$books._id",
+                    "review": "$books.reviews.review",
+                    "score": "$books.reviews.score",
+                    "number_of_upvotes": "$books.reviews.number_of_upvotes"
+                }
             }
-        },
-        {
-            "$unwind": "$book_info"
-        },
-        {
-            "$project": {
-                "_id": 1,
-                "book_id": 1,
-                "review": 1,
-                "score": 1,
-                "number_of_upvotes": 1,
-                "book_name": "$book_info.name"
-            }
-        }
-    ]
-    return reviews_collection.aggregate(pipeline).next()
+        ]
+        result = list(authors_collection.aggregate(pipeline))
+        return result[0] if result else "Review not found"
+    except PyMongoError as e:
+        print(f"An error occurred: {e}")
+        return "An error occurred"
+
+def create_review(book_id, review):
+    try:
+        review["_id"] = ObjectId()
+        authors_collection.update_one(
+            {'books._id': ObjectId(book_id)},
+            {'$push': {'books.$.reviews': review}}
+        )
+        return review
+    except PyMongoError as e:
+        print(f"An error occurred: {e}")
+        return "An error occurred"
+
+def update_review(review_id, updated_review):
+    try:
+        authors_collection.update_one(
+            {'books.reviews._id': ObjectId(review_id)},
+            {'$set': {
+                "books.$[book].reviews.$[review].review": updated_review["review"],
+                "books.$[book].reviews.$[review].score": updated_review["score"],
+                "books.$[book].reviews.$[review].number_of_upvotes": updated_review["number_of_upvotes"]
+            }},
+            array_filters=[
+                {"book.reviews._id": ObjectId(review_id)}
+            ]
+        )
+    except PyMongoError as e:
+        print(f"An error occurred: {e}")
+        return "An error occurred"
+
+def delete_review(review_id):
+    try:
+        authors_collection.update_one(
+            {'books.reviews._id': ObjectId(review_id)},
+            {'$pull': {'books.$[book].reviews': {'_id': ObjectId(review_id)}}},
+            array_filters=[
+                {"book.reviews._id": ObjectId(review_id)}
+            ]
+        )
+    except PyMongoError as e:
+        print(f"An error occurred: {e}")
+        return "An error occurred"

@@ -13,3 +13,6 @@ def search_view(request):
     page = int(request.GET.get('page', 1))
     books = search_books(query, page)
     return render(request, 'search_results.html', {'books': books, 'query': query, 'page': page})
+
+def custom_404(request, exception):
+    return render(request, '404.html', {'message': 'Page not found'}, status=404)

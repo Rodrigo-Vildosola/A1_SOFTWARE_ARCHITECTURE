@@ -1,47 +1,62 @@
 from django.shortcuts import render, redirect
-from reviews.utils import reviews_collection, books_collection
+from reviews.utils import authors_collection
 from bson.objectid import ObjectId
-from reviews.queries.reviews import get_all_reviews, get_review_by_id
+from reviews.queries.reviews import get_all_reviews, get_review_by_id, create_review, update_review, delete_review
 
 
 def review_list(request):
     reviews = get_all_reviews()
+    print(reviews[0])
     return render(request, 'reviews/review_list.html', {'reviews': reviews})
 
 def review_detail(request, pk):
+    print("here")
     review = get_review_by_id(pk)
-    return render(request, 'reviews/review_detail.html', {'review': review})
+    print(review)
+    if review: 
+        return render(request, 'reviews/review_detail.html', {'review': review})
+    else:
+        return render(request, '404.html', {'message': 'Review not found'})
 
 def review_create(request):
     if request.method == "POST":
+        book_id = ObjectId(request.POST.get('book_id'))
         review = {
-            "book_id": ObjectId(request.POST.get('book_id')),
             "review": request.POST.get('review'),
             "score": int(request.POST.get('score')),
             "number_of_upvotes": int(request.POST.get('number_of_upvotes'))
         }
-        reviews_collection.insert_one(review)
+        create_review(book_id, review)
         return redirect('review_list')
-    books = list(books_collection.find())
+    
+    # Fetch only necessary fields (name and id) to avoid loading too much data
+    books = list(authors_collection.aggregate([
+        {"$unwind": "$books"},
+        {"$project": {"_id": "$books._id", "name": "$books.name"}}
+    ]))
     return render(request, 'reviews/review_form.html', {'books': books})
 
 def review_edit(request, pk):
     review = get_review_by_id(pk)
     if request.method == "POST":
         updated_review = {
-            "book_id": ObjectId(request.POST.get('book_id')),
             "review": request.POST.get('review'),
             "score": int(request.POST.get('score')),
             "number_of_upvotes": int(request.POST.get('number_of_upvotes'))
         }
-        reviews_collection.update_one({'_id': ObjectId(pk)}, {'$set': updated_review})
+        update_review(pk, updated_review)
         return redirect('review_list')
-    books = list(books_collection.find())
+    
+    # Fetch only necessary fields (name and id) to avoid loading too much data
+    books = list(authors_collection.aggregate([
+        {"$unwind": "$books"},
+        {"$project": {"_id": "$books._id", "name": "$books.name"}}
+    ]))
     return render(request, 'reviews/review_form.html', {'review': review, 'books': books})
 
 def review_delete(request, pk):
     review = get_review_by_id(pk)
     if request.method == "POST":
-        reviews_collection.delete_one({'_id': ObjectId(pk)})
+        delete_review(pk)
         return redirect('review_list')
     return render(request, 'reviews/review_confirm_delete.html', {'review': review})
