@@ -8,7 +8,9 @@ def sales_list(request):
     return render(request, 'sales/sale_list.html', {'sales': sales})
 
 def sale_detail(request, pk):
+    print("here")
     sale = get_sale_by_id(pk)
+    print(sale)
     return render(request, 'sales/sale_detail.html', {'sale': sale})
 
 def sale_create(request):

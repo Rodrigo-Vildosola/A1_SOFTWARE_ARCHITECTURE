@@ -74,7 +74,8 @@ def update_review(review_id, updated_review):
                 "books.$[book].reviews.$[review].number_of_upvotes": updated_review["number_of_upvotes"]
             }},
             array_filters=[
-                {"book.reviews._id": ObjectId(review_id)}
+                {"book.reviews._id": ObjectId(review_id)},
+                {"review._id": ObjectId(review_id)}
             ]
         )
     except PyMongoError as e:

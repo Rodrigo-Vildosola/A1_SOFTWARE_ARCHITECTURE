@@ -6,7 +6,6 @@ from reviews.queries.reviews import get_all_reviews, get_review_by_id, create_re
 
 def review_list(request):
     reviews = get_all_reviews()
-    print(reviews[0])
     return render(request, 'reviews/review_list.html', {'reviews': reviews})
 
 def review_detail(request, pk):
