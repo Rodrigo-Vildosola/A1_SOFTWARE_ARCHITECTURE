@@ -9,9 +9,7 @@ def review_list(request):
     return render(request, 'reviews/review_list.html', {'reviews': reviews})
 
 def review_detail(request, pk):
-    print("here")
     review = get_review_by_id(pk)
-    print(review)
     if review: 
         return render(request, 'reviews/review_detail.html', {'review': review})
     else:
