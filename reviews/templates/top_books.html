@@ -25,27 +25,8 @@
                         <th class="py-3 px-6 text-left">Lowest Rated Review</th>
                     </tr>
                 </thead>
-                <tbody class="text-gray-600 text-sm font-light">
-                    {% for book in top_rated_books %}
-                        <tr class="border-b border-gray-200 hover:bg-gray-100 transition duration-200">
-                            <td class="py-3 px-6 text-left">
-                                <a href="{% url 'book_detail' book|get_id %}" class="text-indigo-600 hover:underline">{{ book.title }}</a>
-                            </td>
-                            <td class="py-3 px-6 text-left">
-                                <a href="{% url 'author_detail' book.author_id %}" class="text-indigo-600 hover:underline">{{ book.author }}</a>
-                            </td>
-                            <td class="py-3 px-6 text-left">{{ book.average_rating }}</td>
-                            <td class="py-3 px-6 text-left">
-                                <a href="{% url 'review_detail' book.most_popular_highest_review|get_id %}" class="text-indigo-600 hover:underline">{{ book.most_popular_highest_review.review }}</a>
-                            </td>
-                            <td class="py-3 px-6 text-left">
-                                <a href="{% url 'review_detail' book.most_popular_lowest_review|get_id %}" class="text-indigo-600 hover:underline">{{ book.most_popular_lowest_review.review }}</a>
-                            </td>
-                            <td class="py-3 px-6 text-left">
-                                <a href="{% url 'review_detail' book.lowest_rated_review|get_id %}" class="text-indigo-600 hover:underline">{{ book.lowest_rated_review.review }}</a>
-                            </td>
-                        </tr>
-                    {% endfor %}
+                <tbody id="topRatedBooks" class="text-gray-600 text-sm font-light">
+                    <!-- Dynamic content will be loaded here -->
                 </tbody>
             </table>
         </div>
@@ -63,20 +44,8 @@
                         <th class="py-3 px-6 text-left">Top 5 of Publication Year</th>
                     </tr>
                 </thead>
-                <tbody class="text-gray-600 text-sm font-light">
-                    {% for book in top_selling_books %}
-                        <tr class="border-b border-gray-200 hover:bg-gray-100 transition duration-200">
-                            <td class="py-3 px-6 text-left">
-                                <a href="{% url 'book_detail' book|get_id %}" class="text-indigo-600 hover:underline">{{ book.title }}</a>
-                            </td>
-                            <td class="py-3 px-6 text-left">
-                                <a href="{% url 'author_detail' book.author_id %}" class="text-indigo-600 hover:underline">{{ book.author }}</a>
-                            </td>
-                            <td class="py-3 px-6 text-left">{{ book.total_sales }}</td>
-                            <td class="py-3 px-6 text-left">{{ book.author_total_sales }}</td>
-                            <td class="py-3 px-6 text-left">{{ book.top_5_publication_year }}</td>
-                        </tr>
-                    {% endfor %}
+                <tbody id="topSellingBooks" class="text-gray-600 text-sm font-light">
+                    <!-- Dynamic content will be loaded here -->
                 </tbody>
             </table>
         </div>
@@ -98,6 +67,69 @@
         document.getElementById(tabName).classList.remove("hidden");
         evt.currentTarget.classList.add("bg-indigo-600", "text-white");
         evt.currentTarget.classList.remove("bg-gray-300", "text-gray-700");
+
+        if (tabName === 'top-rated') {
+            fetchTopRatedBooks();
+        } else if (tabName === 'top-selling') {
+            fetchTopSellingBooks();
+        }
     }
+
+    async function fetchTopRatedBooks() {
+        const response = await fetch('/top-books/top-rated/');
+        const data = await response.json();
+        const tbody = document.getElementById('topRatedBooks');
+        tbody.innerHTML = '';
+        data.top_rated_books.forEach(book => {
+            const tr = document.createElement('tr');
+            tr.className = 'border-b border-gray-200 hover:bg-gray-100 transition duration-200';
+            tr.innerHTML = `
+                <td class="py-3 px-6 text-left">
+                    <a href="/book/${book._id}" class="text-indigo-600 hover:underline">${book.title}</a>
+                </td>
+                <td class="py-3 px-6 text-left">
+                    <a href="/author/${book.author_id}" class="text-indigo-600 hover:underline">${book.author}</a>
+                </td>
+                <td class="py-3 px-6 text-left">${book.average_rating}</td>
+                <td class="py-3 px-6 text-left">
+                    <a href="/review/${book.most_popular_highest_review._id}" class="text-indigo-600 hover:underline">${book.most_popular_highest_review.review}</a>
+                </td>
+                <td class="py-3 px-6 text-left">
+                    <a href="/review/${book.most_popular_lowest_review._id}" class="text-indigo-600 hover:underline">${book.most_popular_lowest_review.review}</a>
+                </td>
+                <td class="py-3 px-6 text-left">
+                    <a href="/review/${book.lowest_rated_review._id}" class="text-indigo-600 hover:underline">${book.lowest_rated_review.review}</a>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    async function fetchTopSellingBooks() {
+        const response = await fetch('/top-books/top-selling/');
+        const data = await response.json();
+        const tbody = document.getElementById('topSellingBooks');
+        tbody.innerHTML = '';
+        data.top_selling_books.forEach(book => {
+            const tr = document.createElement('tr');
+            tr.className = 'border-b border-gray-200 hover:bg-gray-100 transition duration-200';
+            tr.innerHTML = `
+                <td class="py-3 px-6 text-left">
+                    <a href="/book/${book._id}" class="text-indigo-600 hover:underline">${book.title}</a>
+                </td>
+                <td class="py-3 px-6 text-left">
+                    <a href="/author/${book.author_id}" class="text-indigo-600 hover:underline">${book.author}</a>
+                </td>
+                <td class="py-3 px-6 text-left">${book.total_sales}</td>
+                <td class="py-3 px-6 text-left">${book.author_total_sales}</td>
+                <td class="py-3 px-6 text-left">${book.top_5_publication_year}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchTopRatedBooks();
+    });
 </script>
 {% endblock %}

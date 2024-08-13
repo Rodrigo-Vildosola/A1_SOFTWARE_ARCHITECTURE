@@ -18,15 +18,31 @@ db = Mongo().database
 collection = db.object
 
 def top_books(request):
+    return render(request, 'top_books.html')
+
+def top_rated_books(request):
     top_rated_books = get_top_rated_books()
-    top_selling_books = get_top_selling_books()
-    for i in top_rated_books:
-        print(i)
-    context = {
+    for book in top_rated_books:
+        book['_id'] = str(book['_id'])
+        book['author_id'] = str(book['author_id'])
+
+    response_data = {
         'top_rated_books': top_rated_books,
+    }
+    return JsonResponse(response_data)
+
+def top_selling_books(request):
+    top_selling_books = get_top_selling_books()
+    for book in top_selling_books:
+        book['_id'] = str(book['_id'])
+        book['author_id'] = str(book['author_id'])
+
+    response_data = {
         'top_selling_books': top_selling_books,
     }
-    return render(request, 'top_books.html', context)
+    return JsonResponse(response_data)
+
+
 
 def book_list(request):
     return render(request, 'books/book_list.html')
