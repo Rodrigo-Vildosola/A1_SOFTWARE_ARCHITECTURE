@@ -13,10 +13,15 @@
         <div class="container mx-auto flex justify-between items-center">
             <a href="/" class="text-white text-lg font-semibold">Book Review App</a>
             <div class="flex items-center space-x-4">
-                <form action="{% url 'search' %}" method="get" class="relative">
-                    <input type="text" name="query" placeholder="Search..." class="px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:border-indigo-500">
-                    <button type="submit" class="absolute right-0 top-0 h-full px-4 bg-indigo-600 text-white rounded-r-md hover:bg-indigo-700 transition duration-300">Search</button>
-                </form>
+                <div class="relative">
+                    <form action="{% url 'search' %}" method="get" class="relative">
+                        <input id="searchInput" type="text" name="query" placeholder="Search..." class="px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:border-indigo-500">
+                        <button type="submit" class="absolute right-0 top-0 h-full px-4 bg-indigo-600 text-white rounded-r-md hover:bg-indigo-700 transition duration-300">Search</button>
+                    </form>
+                    <div id="searchResults" class="absolute left-0 right-0 bg-white border border-gray-300 rounded-md mt-1 hidden">
+                        <!-- Search results will be dynamically populated here -->
+                    </div>
+                </div>
                 <a href="/top-books" class="bg-gray-700 hover:bg-gray-900 text-white font-semibold py-2 px-4 rounded-md shadow-md hover:from-green-500 hover:to-blue-600 transition duration-300">Top Books</a>
                 <div class="relative">
                     <button id="dropdownButton" class="bg-gray-700 hover:bg-gray-900 text-white font-semibold py-2 px-4 rounded-md shadow-md focus:outline-none hover:from-green-500 hover:to-blue-600 transition duration-300">
@@ -53,6 +58,47 @@
             if (!isClickInside) {
                 dropdownMenu.classList.add('hidden');
             }
+        });
+
+        // Dynamic search
+        const searchInput = document.getElementById('searchInput');
+        const searchResults = document.getElementById('searchResults');
+
+        searchInput.addEventListener('input', async function() {
+            const query = searchInput.value.toLowerCase();
+            if (query.length < 2) {
+                searchResults.classList.add('hidden');
+                return;
+            }
+
+            const params = new URLSearchParams({ name_filter: query });
+            const response = await fetch(`/books/data/?${params.toString()}`);
+            const data = await response.json();
+
+            if (data.books.length > 0) {
+                searchResults.innerHTML = data.books.map(book => `
+                    <a href="/book/${book._id}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
+                        ${book.name}
+                    </a>
+                `).join('');
+                searchResults.classList.remove('hidden');
+            } else {
+                searchResults.innerHTML = '<p class="px-4 py-2 text-gray-700">No results found</p>';
+                searchResults.classList.remove('hidden');
+            }
+        });
+
+        // Hide search results when input is not focused
+        searchInput.addEventListener('focus', function() {
+            if (searchInput.value.length >= 2) {
+                searchResults.classList.remove('hidden');
+            }
+        });
+
+        searchInput.addEventListener('blur', function() {
+            setTimeout(() => {
+                searchResults.classList.add('hidden');
+            }, 200);
         });
     </script>
 </body>

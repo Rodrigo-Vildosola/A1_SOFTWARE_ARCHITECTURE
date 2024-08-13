@@ -23,7 +23,7 @@ def search_books(query, page=1, limit=10):
         },
         {
             "$project": {
-                "_id": "$books._id",
+                "id": "$books._id",
                 "name": "$books.name",
                 "summary": "$books.summary",
                 "date_of_publication": "$books.date_of_publication",
