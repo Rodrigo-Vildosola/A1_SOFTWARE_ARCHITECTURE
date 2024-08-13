@@ -82,8 +82,6 @@
         // console.log(data)
         data.top_rated_books?.forEach(book => {
             const tr = document.createElement('tr');
-            console.log(book)
-            console.log(book.lowest_rated_review)
 
             tr.className = 'border-b border-gray-200 hover:bg-gray-100 transition duration-200';
             tr.innerHTML = `

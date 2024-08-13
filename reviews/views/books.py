@@ -113,6 +113,21 @@ def book_create(request):
     authors = list(collection.find({}, {"_id": 1, "name": 1}))
     return render(request, 'books/book_form.html', {'authors': authors})
 
+
+def book_create_for_author(request, author_id):
+    if request.method == "POST":
+        book = {
+            "name": request.POST.get('name'),
+            "summary": request.POST.get('summary'),
+            "date_of_publication": request.POST.get('date_of_publication'),
+            "author_id": ObjectId(author_id)
+        }
+        create_book(book)
+        return redirect('author_detail', pk=author_id)
+    
+    author = collection.find_one({"_id": ObjectId(author_id)}, {"_id": 1, "name": 1})
+    return render(request, 'books/book_form.html', {'author': author})
+
 def book_edit(request, pk):
     book = get_book_by_id(pk)
     if request.method == "POST":

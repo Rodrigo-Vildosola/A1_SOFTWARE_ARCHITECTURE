@@ -5,31 +5,38 @@
 
 {% block content %}
 <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden mt-6">
-    <div class="px-6 py-4">
-        <h1 class="text-3xl font-bold mb-4 text-indigo-600">{{ author.name }}</h1>
-        <p class="text-gray-700"><strong>Date of Birth:</strong> {{ author.date_of_birth }}</p>
-        <p class="text-gray-700"><strong>Country of Origin:</strong> {{ author.country_of_origin }}</p>
-        <p class="text-gray-700"><strong>Description:</strong> {{ author.short_description }}</p>
-        <div class="mt-4">
-            <a href="{% url 'author_edit' author|get_id %}" class="bg-yellow-500 text-white px-4 py-2 rounded mr-2 hover:bg-yellow-600 transition duration-300">Edit</a>
-            <a href="{% url 'author_delete' author|get_id %}" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-300">Delete</a>
+    <div class="px-8 py-6">
+        <h1 class="text-4xl font-bold mb-4 text-indigo-600">{{ author.name }}</h1>
+        <p class="text-gray-600 mb-2"><strong class="text-indigo-600">Date of Birth:</strong> {{ author.date_of_birth }}</p>
+        <p class="text-gray-600 mb-2"><strong class="text-indigo-600">Country of Origin:</strong> {{ author.country_of_origin }}</p>
+        <p class="text-gray-600 mb-4"><strong class="text-indigo-600">Description:</strong> {{ author.short_description }}</p>
+        <div class="flex space-x-4 mb-8">
+            <a href="{% url 'author_edit' author|get_id %}" class="bg-gradient-to-r from-yellow-400 to-yellow-500 text-white px-6 py-2 rounded-lg shadow-lg hover:from-yellow-500 hover:to-yellow-600 transition duration-300 flex items-center">
+                <i class="fas fa-edit mr-2"></i> Edit
+            </a>
+            <a href="{% url 'author_delete' author|get_id %}" class="bg-gradient-to-r from-red-400 to-red-500 text-white px-6 py-2 rounded-lg shadow-lg hover:from-red-500 hover:to-red-600 transition duration-300 flex items-center">
+                <i class="fas fa-trash-alt mr-2"></i> Delete
+            </a>
         </div>
-        <div class="mt-6">
-            <h2 class="text-2xl font-bold mb-4 text-indigo-600">Books by {{ author.name }}</h2>
-            {% if books %}
-                <div class="space-y-4">
-                    {% for book in books %}
-                        <div class="bg-gray-100 p-4 rounded-lg shadow-md">
-                            <a href="{% url 'book_detail' book|get_id %}" class="text-indigo-600 hover:underline">{{ book.name }}</a>
-                            <p class="text-gray-700">{{ book.summary }}</p>
-                            <p class="text-gray-700"><strong>Date of Publication:</strong> {{ book.date_of_publication }}</p>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <p class="text-gray-700">No books available.</p>
-            {% endif %}
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-3xl font-bold text-indigo-600">Books by {{ author.name }}</h2>
+            <a href="{% url 'book_create_for_author' author|get_id %}" class="bg-gradient-to-r from-green-400 to-blue-500 text-white px-6 py-3 rounded-lg shadow-lg hover:from-green-500 hover:to-blue-600 transition duration-300 flex items-center">
+                <i class="fas fa-plus mr-2"></i> Add New Book
+            </a>
         </div>
+        {% if books %}
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                {% for book in books %}
+                    <div class="bg-gray-100 p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300">
+                        <a href="{% url 'book_detail' book|get_id %}" class="text-2xl font-semibold text-indigo-700 hover:underline">{{ book.name }}</a>
+                        <p class="text-gray-600 mt-2">{{ book.summary }}</p>
+                        <p class="text-gray-600 mt-1"><strong class="text-indigo-600">Date of Publication:</strong> {{ book.date_of_publication }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-gray-600">No books available.</p>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
