@@ -6,36 +6,14 @@
 {% block content %}
 <div class="max-w-6xl mx-auto mt-6">
     <h1 class="text-3xl font-bold mb-4 text-indigo-600">Books</h1>
-    <div class="overflow-x-auto">
-      <div class="flex flex-row items-center justify-between">
-          <div id="pagination" class="mb-4">
+    <div class="flex justify-between items-center mb-4">
+        <div id="pagination" class="flex space-x-2">
             <!-- Pagination buttons will be loaded here -->
-          </div>
-          <input class="p-2 rounded-md shadow-sm border border-gray-400" type="text" id="nameFilter" onkeyup="filterTable()" placeholder="Search for books..">
-        </div>  
-        <table id="bookTable" class="min-w-full bg-white ">
-            <thead>
-                <tr class="bg-gray-100">
-                    <th class="py-2 px-4">
-                    </th>
-                    <th class="py-2 px-4"></th>
-                    <th class="py-2 px-4"></th>
-                    <th class="py-2 px-4"></th>
-                    <th class="py-2 px-4"></th>
-                </tr>
-                <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
-                    <th class="py-3 px-6 text-left">Name</th>
-                    <th class="py-3 px-6 text-left">Summary</th>
-                    <th class="py-3 px-6 text-left">Date of Publication</th>
-                    <th class="py-3 px-6 text-left">Number of Sales</th>
-                    <th class="py-3 px-6 text-left">Actions</th>
-                </tr>
-            </thead>
-            <tbody id="bookTbody" class="text-gray-600 text-sm font-light">
-                <!-- Dynamic content will be loaded here -->
-            </tbody>
-        </table>
-
+        </div>
+        <input class="p-2 rounded-md shadow-sm border border-gray-400" type="text" id="nameFilter" onkeyup="filterTable()" placeholder="Search for books..">
+    </div>
+    <div id="bookContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Dynamic content will be loaded here -->
     </div>
     <a href="{% url 'book_create' %}" class="mt-4 inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300">Add new book</a>
 </div>
@@ -51,34 +29,38 @@ async function loadBooks(page = currentPage) {
         name_filter: nameFilter
     });
 
-    document.getElementById('bookTbody').innerHTML = `
-        <tr>
-            <td colspan="5" class="loading-container">
-                <div class="spinner"></div>
-            </td>
-        </tr>`;
+    document.getElementById('bookContainer').innerHTML = `
+        <div class="col-span-4 loading-container">
+            <div class="spinner"></div>
+        </div>`;
 
     const response = await fetch(`/books/data/?${params.toString()}`);
     const data = await response.json();
 
-    const tbody = document.getElementById('bookTbody');
-    tbody.innerHTML = '';
+    const container = document.getElementById('bookContainer');
+    container.innerHTML = '';
     data.books.forEach(book => {
-        const tr = document.createElement('tr');
-        tr.className = 'border-b border-gray-200 hover:bg-gray-100 transition duration-200';
-        tr.innerHTML = `
-            <td class="py-3 px-6 text-left whitespace-nowrap">
-              <a href="/book/${book._id}" class="text-blue-500 hover:underline">${book.name}</a>
-            </td>
-            <td class="py-3 px-6 text-left">${book.summary}</td>
-            <td class="py-3 px-6 text-left">${book.date_of_publication}</td>
-            <td class="py-3 px-6 text-left">${book.number_of_sales}</td>
-            <td class="py-3 px-6 text-left">
-                <a href="/book/${book._id}/edit" class="text-yellow-500 hover:underline">Edit</a> |
-                <a href="/book/${book._id}/delete" class="text-red-500 hover:underline">Delete</a>
-            </td>
+        const card = document.createElement('div');
+        card.className = 'bg-white shadow-md rounded-lg p-4 flex flex-col justify-between';
+        card.innerHTML = `
+            <div>
+                <h2 class="text-lg font-semibold text-blue-500 hover:underline mb-4">
+                    <a href="/book/${book._id}">${book.name}</a>
+                </h2>
+                <p class="text-sm text-gray-600 summary mb-2">${book.summary}</p>
+                <p class="text-sm text-gray-500"><strong>Published</strong>: ${book.date_of_publication}</p>
+                <p class="text-sm text-gray-500"><strong>Sales</strong>: ${book.number_of_sales}</p>
+            </div>
+            <div class="mt-4 flex justify-end space-x-2">
+                <a href="/book/${book._id}/edit" class="text-yellow-500 hover:underline">
+                    <i class="fas fa-edit"></i> Edit
+                </a>
+                <a href="/book/${book._id}/delete" class="text-red-500 hover:underline">
+                    <i class="fas fa-trash-alt"></i> Delete
+                </a>
+            </div>
         `;
-        tbody.appendChild(tr);
+        container.appendChild(card);
     });
 
     const pagination = document.getElementById('pagination');
