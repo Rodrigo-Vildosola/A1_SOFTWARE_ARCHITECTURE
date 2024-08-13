@@ -1,11 +1,30 @@
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from bson.objectid import ObjectId
 from reviews.queries.sales import get_all_sales, get_sale_by_id, create_sale, update_sale, delete_sale
 from reviews.utils import collection
 
 def sales_list(request):
-    sales = get_all_sales()
-    return render(request, 'sales/sale_list.html', {'sales': sales})
+    return render(request, 'sales/sale_list.html')
+
+def sales_data(request):
+    page = int(request.GET.get('page', 1))
+    name_filter = request.GET.get('name_filter', '')
+
+    sales, total_sales_count = get_all_sales(page, name_filter)
+
+    for sale in sales:
+        sale['_id'] = str(sale['_id'])
+        sale['book_id'] = str(sale['book_id'])
+
+    response_data = {
+        'sales': sales,
+        'num_pages': (total_sales_count + 19) // 20,  # Calculate number of pages
+        'current_page': page,
+    }
+
+    return JsonResponse(response_data)
+
 
 def sale_detail(request, pk):
     sale = get_sale_by_id(pk)

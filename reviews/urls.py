@@ -4,7 +4,7 @@ from .views import (
     author_list, author_data, author_detail, author_create, author_edit, author_delete,
     top_books, book_list, book_data, book_detail, book_create, book_edit, book_delete,
     review_list, review_data, review_detail, review_create, review_edit, review_delete,
-    sales_list, sale_detail, sale_create, sale_edit, sale_delete
+    sales_list, sales_data, sale_detail, sale_create, sale_edit, sale_delete
 )
 
 urlpatterns = [
@@ -29,13 +29,13 @@ urlpatterns = [
 
     path('reviews/', review_list, name='review_list'),
     path('reviews/data/', review_data, name='review_data'),
-
     path('review/new/', review_create, name='review_create'),
     path('review/<str:pk>/edit/', review_edit, name='review_edit'),
     path('review/<str:pk>/delete/', review_delete, name='review_delete'),
     path('review/<str:pk>/', review_detail, name='review_detail'),
 
     path('sales/', sales_list, name='sales_list'),
+    path('sales/data/', sales_data, name='sales_data'),
     path('sale/new/', sale_create, name='sale_create'),
     path('sale/<str:pk>/edit/', sale_edit, name='sale_edit'),
     path('sale/<str:pk>/delete/', sale_delete, name='sale_delete'),

@@ -6,11 +6,16 @@ from pymongo.errors import PyMongoError
 db = Mongo().database
 collection = db['object']
 
-def get_all_sales():
+def get_all_sales(page=1, name_filter=''):
     try:
         pipeline = [
             {"$unwind": "$books"},
             {"$unwind": "$books.sales"},
+            {
+                "$match": {
+                    "books.name": {"$regex": name_filter, "$options": "i"}
+                }
+            },
             {
                 "$project": {
                     "_id": "$books.sales._id",
@@ -20,12 +25,31 @@ def get_all_sales():
                     "year": "$books.sales.year",
                     "sales": "$books.sales.sales"
                 }
-            }
+            },
+            {"$sort": {"book_name": 1}},  # Sort by book name
+            {"$skip": (page - 1) * 20},   # Skip the documents for pagination
+            {"$limit": 20}                # Limit the results to 20 per page
         ]
-        return list(collection.aggregate(pipeline))
+
+        total_sales_pipeline = [
+            {"$unwind": "$books"},
+            {"$unwind": "$books.sales"},
+            {
+                "$match": {
+                    "books.name": {"$regex": name_filter, "$options": "i"}
+                }
+            },
+            {"$count": "total"}
+        ]
+
+        sales = list(collection.aggregate(pipeline))
+        
+        total_sales_count = next(collection.aggregate(total_sales_pipeline), {}).get('total', 0)
+        return sales, total_sales_count
     except PyMongoError as e:
         print(f"An error occurred: {e}")
-        return []
+        return [], 0
+
 
 def get_sale_by_id(sale_id):
     try:
