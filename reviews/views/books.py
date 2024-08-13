@@ -23,8 +23,13 @@ def top_books(request):
 def top_rated_books(request):
     top_rated_books = get_top_rated_books()
     for book in top_rated_books:
+        print(book)
         book['_id'] = str(book['_id'])
         book['author_id'] = str(book['author_id'])
+        if book.get('highest_rated_review'):
+            book['highest_rated_review']['_id'] = str(book['highest_rated_review']['_id'])
+        if book.get('lowest_rated_review'):
+            book['lowest_rated_review']['_id'] = str(book['lowest_rated_review']['_id'])
 
     response_data = {
         'top_rated_books': top_rated_books,

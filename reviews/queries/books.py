@@ -14,16 +14,12 @@ def get_top_rated_books():
             {"$unwind": "$books.reviews"},
             {
                 "$group": {
-                    "_id": {
-                        "book_id": "$books._id",
-                        "book_name": "$books.name",
-                        "author_name": "$name",
-                        "author_id": "$_id"
-                    },
+                    "_id": "$books._id",
+                    "book_name": {"$first": "$books.name"},
+                    "author_name": {"$first": "$name"},
+                    "author_id": {"$first": "$_id"},
                     "average_score": {"$avg": "$books.reviews.score"},
-                    "highest_rated_review": {"$max": "$books.reviews.score"},
-                    "lowest_rated_review": {"$min": "$books.reviews.score"},
-                    "most_popular_highest_review": {
+                    "highest_rated_review": {
                         "$first": {
                             "$cond": {
                                 "if": {"$eq": ["$books.reviews.score", {"$max": "$books.reviews.score"}]},
@@ -32,7 +28,7 @@ def get_top_rated_books():
                             }
                         }
                     },
-                    "most_popular_lowest_review": {
+                    "lowest_rated_review": {
                         "$first": {
                             "$cond": {
                                 "if": {"$eq": ["$books.reviews.score", {"$min": "$books.reviews.score"}]},
@@ -47,13 +43,12 @@ def get_top_rated_books():
             {"$limit": 10},
             {
                 "$project": {
-                    "book_id": "$_id.book_id",
-                    "book_name": "$_id.book_name",
-                    "author_name": "$_id.author_name",
-                    "author_id": "$_id.author_id",
+                    "book_name": 1,
+                    "author_name": 1,
+                    "author_id": 1,
                     "average_score": 1,
-                    "most_popular_highest_review": 1,
-                    "most_popular_lowest_review": 1
+                    "highest_rated_review": 1,
+                    "lowest_rated_review": 1
                 }
             }
         ]
@@ -61,6 +56,8 @@ def get_top_rated_books():
     except PyMongoError as e:
         print(f"An error occurred: {e}")
         return []
+
+
 
 def get_top_selling_books():
     pipeline = [

@@ -20,8 +20,7 @@
                         <th class="py-3 px-6 text-left">Title</th>
                         <th class="py-3 px-6 text-left">Author</th>
                         <th class="py-3 px-6 text-left">Rating</th>
-                        <th class="py-3 px-6 text-left">Most Popular Review</th>
-                        <th class="py-3 px-6 text-left">Highest Rated Review</th>
+                        <th class="py-3 px-6 text-left">Highes Rated Review</th>
                         <th class="py-3 px-6 text-left">Lowest Rated Review</th>
                     </tr>
                 </thead>
@@ -80,22 +79,23 @@
         const data = await response.json();
         const tbody = document.getElementById('topRatedBooks');
         tbody.innerHTML = '';
-        data.top_rated_books.forEach(book => {
+        // console.log(data)
+        data.top_rated_books?.forEach(book => {
             const tr = document.createElement('tr');
+            console.log(book)
+            console.log(book.lowest_rated_review)
+
             tr.className = 'border-b border-gray-200 hover:bg-gray-100 transition duration-200';
             tr.innerHTML = `
                 <td class="py-3 px-6 text-left">
-                    <a href="/book/${book._id}" class="text-indigo-600 hover:underline">${book.title}</a>
+                    <a href="/book/${book._id}" class="text-indigo-600 hover:underline">${book.book_name}</a>
                 </td>
                 <td class="py-3 px-6 text-left">
-                    <a href="/author/${book.author_id}" class="text-indigo-600 hover:underline">${book.author}</a>
+                    <a href="/author/${book.author_id}" class="text-indigo-600 hover:underline">${book.author_name}</a>
                 </td>
-                <td class="py-3 px-6 text-left">${book.average_rating}</td>
+                <td class="py-3 px-6 text-left">${book.average_score}</td>
                 <td class="py-3 px-6 text-left">
-                    <a href="/review/${book.most_popular_highest_review._id}" class="text-indigo-600 hover:underline">${book.most_popular_highest_review.review}</a>
-                </td>
-                <td class="py-3 px-6 text-left">
-                    <a href="/review/${book.most_popular_lowest_review._id}" class="text-indigo-600 hover:underline">${book.most_popular_lowest_review.review}</a>
+                    <a href="/review/${book.highest_rated_review._id}" class="text-indigo-600 hover:underline">${book.highest_rated_review.review}</a>
                 </td>
                 <td class="py-3 px-6 text-left">
                     <a href="/review/${book.lowest_rated_review._id}" class="text-indigo-600 hover:underline">${book.lowest_rated_review.review}</a>
@@ -115,10 +115,10 @@
             tr.className = 'border-b border-gray-200 hover:bg-gray-100 transition duration-200';
             tr.innerHTML = `
                 <td class="py-3 px-6 text-left">
-                    <a href="/book/${book._id}" class="text-indigo-600 hover:underline">${book.title}</a>
+                    <a href="/book/${book._id}" class="text-indigo-600 hover:underline">${book.book_name}</a>
                 </td>
                 <td class="py-3 px-6 text-left">
-                    <a href="/author/${book.author_id}" class="text-indigo-600 hover:underline">${book.author}</a>
+                    <a href="/author/${book.author_id}" class="text-indigo-600 hover:underline">${book.author_name}</a>
                 </td>
                 <td class="py-3 px-6 text-left">${book.total_sales}</td>
                 <td class="py-3 px-6 text-left">${book.author_total_sales}</td>
