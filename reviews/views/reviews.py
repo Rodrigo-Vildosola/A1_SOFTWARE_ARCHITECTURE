@@ -1,3 +1,4 @@
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from reviews.utils import collection
 from bson.objectid import ObjectId
@@ -5,8 +6,26 @@ from reviews.queries.reviews import get_all_reviews, get_review_by_id, create_re
 
 
 def review_list(request):
-    reviews = get_all_reviews()
-    return render(request, 'reviews/review_list.html', {'reviews': reviews})
+    return render(request, 'reviews/review_list.html')
+
+def review_data(request):
+    page = int(request.GET.get('page', 1))
+    name_filter = request.GET.get('name_filter', '')
+
+    reviews, total_reviews_count = get_all_reviews(page, name_filter)
+
+    for review in reviews:
+        review['_id'] = str(review['_id'])
+        review['book_id'] = str(review['book_id'])
+
+
+    response_data = {
+        'reviews': reviews,
+        'num_pages': (total_reviews_count + 19) // 20,  # Calculate number of pages
+        'current_page': page,
+    }
+
+    return JsonResponse(response_data)
 
 def review_detail(request, pk):
     review = get_review_by_id(pk)

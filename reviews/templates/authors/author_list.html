@@ -4,8 +4,13 @@
 {% block title %}Authors{% endblock %}
 
 {% block content %}
-<div class="max-w-6xl mx-auto mt-6">
-    <h1 class="text-3xl font-bold mb-4 text-indigo-600">Authors</h1>
+<div class="max-w-7xl mx-auto mt-6">
+    <div class="flex justify-between items-center mb-20 mt-10">
+      <h1 class="text-4xl font-bold text-indigo-600">Authors</h1>
+      <a href="{% url 'author_create' %}" class="inline-block bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-6 py-3 rounded-lg shadow-lg hover:from-indigo-700 hover:to-purple-700 transition duration-300 flex items-center">
+          <i class="fas fa-plus mr-2"></i> Add New Author
+      </a>
+    </div>
     <div class="flex justify-between items-center mb-4">
         <div id="pagination" class="flex space-x-2">
             <!-- Pagination buttons will be loaded here -->
@@ -15,25 +20,25 @@
     <div class="overflow-x-auto shadow-lg rounded-lg">
         <table id="authorTable" class="min-w-full bg-white">
             <thead>
-                <tr class="bg-indigo-600 text-white uppercase text-sm leading-normal">
+                <tr class="bg-gradient-to-r from-indigo-500 to-purple-500 text-white uppercase text-sm leading-normal">
                     <th class="py-3 px-6 text-left cursor-pointer">
                         <a href="#" onclick="toggleSort('name')" class="flex items-center">
-                            <span>Name</span> <span id="sort-name" class="ml-2"></span>
+                            <span>Name</span> <span id="sort-name" class="ml-2"><i class="fas fa-sort mr-2"></i></span>
                         </a>
                     </th>
                     <th class="py-3 px-6 text-left cursor-pointer">
                         <a href="#" onclick="toggleSort('number_of_books')" class="flex items-center">
-                            <span>Number of Books</span> <span id="sort-number_of_books" class="ml-2"></span>
+                            <span>Number of Books</span> <span id="sort-number_of_books" class="ml-2"><i class="fas fa-sort mr-2"></i></span>
                         </a>
                     </th>
                     <th class="py-3 px-6 text-left cursor-pointer">
                         <a href="#" onclick="toggleSort('average_score')" class="flex items-center">
-                            <span>Average Score</span> <span id="sort-average_score" class="ml-2"></span>
+                            <span>Average Score</span> <span id="sort-average_score" class="ml-2"><i class="fas fa-sort mr-2"></i></span>
                         </a>
                     </th>
                     <th class="py-3 px-6 text-left cursor-pointer">
                         <a href="#" onclick="toggleSort('total_sales')" class="flex items-center">
-                            <span>Total Sales</span> <span id="sort-total_sales" class="ml-2"></span>
+                            <span>Total Sales</span> <span id="sort-total_sales" class="ml-2"><i class="fas fa-sort mr-2"></i></span>
                         </a>
                     </th>
                     <th class="py-3 px-6 text-left">Actions</th>
@@ -44,7 +49,6 @@
             </tbody>
         </table>
     </div>
-    <a href="{% url 'author_create' %}" class="mt-4 inline-block bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition duration-300">Add new author</a>
 </div>
 
 <script>

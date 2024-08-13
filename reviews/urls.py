@@ -3,7 +3,7 @@ from .views import (
     home, search_view,
     author_list, author_data, author_detail, author_create, author_edit, author_delete,
     top_books, book_list, book_data, book_detail, book_create, book_edit, book_delete,
-    review_list, review_detail, review_create, review_edit, review_delete,
+    review_list, review_data, review_detail, review_create, review_edit, review_delete,
     sales_list, sale_detail, sale_create, sale_edit, sale_delete
 )
 
@@ -28,6 +28,8 @@ urlpatterns = [
 
 
     path('reviews/', review_list, name='review_list'),
+    path('reviews/data/', review_data, name='review_data'),
+
     path('review/new/', review_create, name='review_create'),
     path('review/<str:pk>/edit/', review_edit, name='review_edit'),
     path('review/<str:pk>/delete/', review_delete, name='review_delete'),

@@ -4,12 +4,23 @@
 {% block title %}Reviews{% endblock %}
 
 {% block content %}
-<div class="max-w-6xl mx-auto mt-6">
-    <h1 class="text-3xl font-bold mb-4 text-indigo-600">Reviews</h1>
-    <div class="overflow-x-auto">
-        <table class="min-w-full bg-white border border-gray-200">
+<div class="max-w-7xl mx-auto mt-6">
+    <div class="flex justify-between items-center mb-20 mt-10">
+        <h1 class="text-4xl font-bold text-indigo-600">Reviews</h1>
+        <a href="{% url 'review_create' %}" class="inline-block bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-6 py-3 rounded-lg shadow-lg hover:from-indigo-700 hover:to-purple-700 transition duration-300 flex items-center">
+            <i class="fas fa-plus mr-2"></i> Add New Review
+        </a>
+    </div>
+    <div class="flex justify-between items-center mb-4">
+        <div id="pagination" class="flex space-x-2">
+            <!-- Pagination buttons will be loaded here -->
+        </div>
+        <input class="p-2 rounded-md shadow-sm border border-gray-300 focus:border-indigo-500" type="text" id="nameFilter" onkeyup="filterTable()" placeholder="Search for reviews..">
+    </div>
+    <div class="overflow-x-auto shadow-lg rounded-lg">
+        <table id="reviewTable" class="min-w-full bg-white">
             <thead>
-                <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+                <tr class="bg-gradient-to-r from-indigo-500 to-purple-500 text-white uppercase text-sm leading-normal">
                     <th class="py-3 px-6 text-left">Book</th>
                     <th class="py-3 px-6 text-left">Review</th>
                     <th class="py-3 px-6 text-left">Score</th>
@@ -17,23 +28,110 @@
                     <th class="py-3 px-6 text-left">Actions</th>
                 </tr>
             </thead>
-            <tbody class="text-gray-600 text-sm font-light">
-                {% for review in reviews %}
-                    <tr class="border-b border-gray-200 hover:bg-gray-100">
-                        <td class="py-3 px-6 text-left">{{ review.book_name }}</td>
-                        <td class="py-3 px-6 text-left">{{ review.review }}</td>
-                        <td class="py-3 px-6 text-left">{{ review.score }}</td>
-                        <td class="py-3 px-6 text-left">{{ review.number_of_upvotes }}</td>
-                        <td class="py-3 px-6 text-left">
-                            <a href="{% url 'review_detail' review|get_id %}" class="text-blue-500 hover:underline">View</a> |
-                            <a href="{% url 'review_edit' review|get_id %}" class="text-yellow-500 hover:underline">Edit</a> |
-                            <a href="{% url 'review_delete' review|get_id %}" class="text-red-500 hover:underline">Delete</a>
-                        </td>
-                    </tr>
-                {% endfor %}
+            <tbody id="reviewTbody" class="text-gray-700">
+                <!-- Dynamic content will be loaded here -->
             </tbody>
         </table>
     </div>
-    <a href="{% url 'review_create' %}" class="mt-4 inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300">Add new review</a>
 </div>
+
+<script>
+let currentPage = 1;
+
+async function loadReviews(page = currentPage) {
+    const nameFilter = document.getElementById('nameFilter').value.toLowerCase();
+
+    const params = new URLSearchParams({
+        page: page,
+        name_filter: nameFilter
+    });
+
+    document.getElementById('reviewTbody').innerHTML = `
+        <tr>
+            <td colspan="5" class="loading-container">
+                <div class="spinner"></div>
+            </td>
+        </tr>`;
+
+    const response = await fetch(`/reviews/data/?${params.toString()}`);
+    const data = await response.json();
+
+    const tbody = document.getElementById('reviewTbody');
+    tbody.innerHTML = '';
+    data.reviews.forEach(review => {
+        const tr = document.createElement('tr');
+        tr.className = 'border-b border-gray-200 hover:bg-gray-100 transition duration-200';
+        tr.innerHTML = `
+            <td class="py-3 px-6 text-left">
+                <a href="/review/${review._id}" class="text-blue-500 hover:underline"></i>${review.book_name}</a>
+            </td>
+            <td class="py-3 px-6 text-left">${review.review}</td>
+            <td class="py-3 px-6 text-left">${review.score}</td>
+            <td class="py-3 px-6 text-left">${review.number_of_upvotes}</td>
+            <td class="py-3 px-6 text-left text-xl">
+                <a href="/review/${review._id}/edit" class="text-yellow-500 hover:text-yellow-600 transition duration-300"><i class="fas fa-edit"></i></a> |
+                <a href="/review/${review._id}/delete" class="text-red-500 hover:text-red-600 transition duration-300"><i class="fas fa-trash-alt"></i></a>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+
+    const pagination = document.getElementById('pagination');
+    pagination.innerHTML = '';
+
+    const totalPages = data.num_pages;
+    const currentPage = data.current_page;
+
+    let startPage = Math.max(1, currentPage - 5);
+    let endPage = Math.min(totalPages, currentPage + 5);
+
+    if (startPage > 1) {
+        const firstPageButton = document.createElement('button');
+        firstPageButton.className = `px-4 py-2 mx-1 rounded bg-gray-200 text-indigo-600 hover:bg-indigo-600 hover:text-white transition duration-300`;
+        firstPageButton.innerText = '1';
+        firstPageButton.onclick = () => loadReviews(1);
+        pagination.appendChild(firstPageButton);
+
+        if (startPage > 2) {
+            const dots = document.createElement('span');
+            dots.className = 'px-4 py-2 mx-1';
+            dots.innerText = '...';
+            pagination.appendChild(dots);
+        }
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+        const button = document.createElement('button');
+        button.className = `px-4 py-2 mx-1 rounded ${i == currentPage ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-indigo-600 hover:bg-indigo-600 hover:text-white transition duration-300'}`;
+        button.innerText = i;
+        button.onclick = () => loadReviews(i);
+        pagination.appendChild(button);
+    }
+
+    if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+            const dots = document.createElement('span');
+            dots.className = 'px-4 py-2 mx-1';
+            dots.innerText = '...';
+            pagination.appendChild(dots);
+        }
+
+        const lastPageButton = document.createElement('button');
+        lastPageButton.className = `px-4 py-2 mx-1 rounded bg-gray-200 text-indigo-600 hover:bg-indigo-600 hover:text-white transition duration-300`;
+        lastPageButton.innerText = totalPages;
+        lastPageButton.onclick = () => loadReviews(totalPages);
+        pagination.appendChild(lastPageButton);
+    }
+}
+
+function filterTable() {
+    currentPage = 1;
+    loadReviews();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadReviews();
+});
+</script>
+
 {% endblock %}

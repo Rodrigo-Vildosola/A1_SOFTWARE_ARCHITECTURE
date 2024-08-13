@@ -6,11 +6,16 @@ from pymongo.errors import PyMongoError
 db = Mongo().database
 collection = db['object']
 
-def get_all_reviews():
+def get_all_reviews(page=1, name_filter=''):
     try:
         pipeline = [
             {"$unwind": "$books"},
             {"$unwind": "$books.reviews"},
+            {
+                "$match": {
+                    "books.name": {"$regex": name_filter, "$options": "i"}
+                }
+            },
             {
                 "$project": {
                     "_id": "$books.reviews._id",
@@ -21,12 +26,31 @@ def get_all_reviews():
                     "score": "$books.reviews.score",
                     "number_of_upvotes": "$books.reviews.number_of_upvotes"
                 }
-            }
+            },
+            {"$sort": {"book_name": 1}},  # Sort by book name
+            {"$skip": (page - 1) * 20},   # Skip the documents for pagination
+            {"$limit": 20}                # Limit the results to 20 per page
         ]
-        return list(collection.aggregate(pipeline))
+
+        total_reviews_pipeline = [
+            {"$unwind": "$books"},
+            {"$unwind": "$books.reviews"},
+            {
+                "$match": {
+                    "books.name": {"$regex": name_filter, "$options": "i"}
+                }
+            },
+            {"$count": "total"}
+        ]
+
+        reviews = list(collection.aggregate(pipeline))
+        
+        total_reviews_count = next(collection.aggregate(total_reviews_pipeline), {}).get('total', 0)
+        return reviews, total_reviews_count
     except PyMongoError as e:
         print(f"An error occurred: {e}")
-        return []
+        return [], 0
+    
 
 def get_review_by_id(review_id):
     try:
