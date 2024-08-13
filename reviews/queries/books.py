@@ -132,7 +132,7 @@ def get_top_selling_books():
     return list(authors_collection.aggregate(pipeline))
 
 
-def get_books_aggregate():
+def get_books_aggregate(page, name_filter=''):
     pipeline = [
         {
             "$unwind": "$books"
@@ -144,6 +144,11 @@ def get_books_aggregate():
             }
         },
         {
+            "$match": {
+                "books.name": { "$regex": name_filter, "$options": "i" }
+            }
+        },
+        {
             "$group": {
                 "_id": "$books._id",
                 "name": { "$first": "$books.name" },
@@ -152,10 +157,18 @@ def get_books_aggregate():
                 "author_id": { "$first": "$_id" },
                 "number_of_sales": { '$sum': { '$toInt': '$books.sales.sales' } }
             }
+        },
+        {
+            "$sort": { "name": 1 }  # Default sorting by name
+        },
+        {
+            "$skip": (page - 1) * 20
+        },
+        {
+            "$limit": 20
         }
     ]
     return list(authors_collection.aggregate(pipeline))
-
 
 def get_book_by_id(pk):
     pipeline = [

@@ -4,11 +4,52 @@
 {% block title %}Books{% endblock %}
 
 {% block content %}
+<style>
+/* Spinner CSS */
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border-left-color: #09f;
+  animation: spin 1s ease infinite;
+  margin: auto;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: calc(40px * 10); /* Adjust height to match 10 rows */
+  text-align: center;
+  width: 100%;
+}
+
+</style>
+
 <div class="max-w-6xl mx-auto mt-6">
     <h1 class="text-3xl font-bold mb-4 text-indigo-600">Books</h1>
     <div class="overflow-x-auto">
-        <table class="min-w-full bg-white border border-gray-200">
+        <div id="pagination" class="mb-4">
+          <!-- Pagination buttons will be loaded here -->
+        </div>
+        <table id="bookTable" class="min-w-full bg-white border border-gray-200">
             <thead>
+                <tr class="bg-gray-100">
+                    <th class="py-2 px-4">
+                        <input class="p-2 rounded-md shadow-sm border border-gray-400" type="text" id="nameFilter" onkeyup="filterTable()" placeholder="Search for books..">
+                    </th>
+                    <th class="py-2 px-4"></th>
+                    <th class="py-2 px-4"></th>
+                    <th class="py-2 px-4"></th>
+                    <th class="py-2 px-4"></th>
+                </tr>
                 <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
                     <th class="py-3 px-6 text-left">Name</th>
                     <th class="py-3 px-6 text-left">Summary</th>
@@ -17,23 +58,77 @@
                     <th class="py-3 px-6 text-left">Actions</th>
                 </tr>
             </thead>
-            <tbody class="text-gray-600 text-sm font-light">
-                {% for book in books %}
-                    <tr class="border-b border-gray-200 hover:bg-gray-100">
-                        <td class="py-3 px-6 text-left">{{ book.name }}</td>
-                        <td class="py-3 px-6 text-left">{{ book.summary }}</td>
-                        <td class="py-3 px-6 text-left">{{ book.date_of_publication }}</td>
-                        <td class="py-3 px-6 text-left">{{ book.number_of_sales }}</td>
-                        <td class="py-3 px-6 text-left">
-                            <a href="{% url 'book_detail' book|get_id %}" class="text-blue-500 hover:underline">View</a> |
-                            <a href="{% url 'book_edit' book|get_id %}" class="text-yellow-500 hover:underline">Edit</a> |
-                            <a href="{% url 'book_delete' book|get_id %}" class="text-red-500 hover:underline">Delete</a>
-                        </td>
-                    </tr>
-                {% endfor %}
+            <tbody id="bookTbody" class="text-gray-600 text-sm font-light">
+                <!-- Dynamic content will be loaded here -->
             </tbody>
         </table>
+
     </div>
     <a href="{% url 'book_create' %}" class="mt-4 inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300">Add new book</a>
 </div>
+
+<script>
+let currentPage = 1;
+
+async function loadBooks(page = currentPage) {
+    const nameFilter = document.getElementById('nameFilter').value.toLowerCase();
+    
+    const params = new URLSearchParams({
+        page: page,
+        name_filter: nameFilter
+    });
+
+    document.getElementById('bookTbody').innerHTML = `
+        <tr>
+            <td colspan="5" class="loading-container">
+                <div class="spinner"></div>
+            </td>
+        </tr>`;
+
+    const response = await fetch(`/books/data/?${params.toString()}`);
+    const data = await response.json();
+
+    const tbody = document.getElementById('bookTbody');
+    tbody.innerHTML = '';
+    data.books.forEach(book => {
+        const tr = document.createElement('tr');
+        tr.className = 'border-b border-gray-200 hover:bg-gray-100 transition duration-200';
+        tr.innerHTML = `
+            <td class="py-3 px-6 text-left whitespace-nowrap">
+              <a href="/book/${book._id}" class="text-blue-500 hover:underline">${book.name}</a>
+            </td>
+            <td class="py-3 px-6 text-left">${book.summary}</td>
+            <td class="py-3 px-6 text-left">${book.date_of_publication}</td>
+            <td class="py-3 px-6 text-left">${book.number_of_sales}</td>
+            <td class="py-3 px-6 text-left">
+                <a href="/book/${book._id}/edit" class="text-yellow-500 hover:underline">Edit</a> |
+                <a href="/book/${book._id}/delete" class="text-red-500 hover:underline">Delete</a>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+
+    const pagination = document.getElementById('pagination');
+    pagination.innerHTML = '';
+    for (let i = 1; i <= data.num_pages; i++) {
+        const button = document.createElement('button');
+        button.className = `px-4 py-2 mx-1 ${i == data.current_page ? 'bg-blue-500 text-white' : 'bg-white text-blue-500'}`;
+        button.innerText = i;
+        button.onclick = () => loadBooks(i);
+        pagination.appendChild(button);
+    }
+
+    currentPage = page;
+}
+
+function filterTable() {
+    currentPage = 1;
+    loadBooks();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadBooks();
+});
+</script>
+
 {% endblock %}

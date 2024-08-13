@@ -1,3 +1,4 @@
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from bson.objectid import ObjectId
 from reviews.mongo import Mongo
@@ -28,8 +29,43 @@ def top_books(request):
     return render(request, 'top_books.html', context)
 
 def book_list(request):
-    books = get_books_aggregate()
-    return render(request, 'books/book_list.html', {'books': books})
+    return render(request, 'books/book_list.html')
+
+def book_data(request):
+    page = int(request.GET.get('page', 1))
+    name_filter = request.GET.get('name_filter', '')
+
+    books = get_books_aggregate(page, name_filter)
+    
+    # Convert ObjectId to string
+    for book in books:
+        book['_id'] = str(book['_id'])
+        book['author_id'] = str(book['author_id'])
+
+    total_books = authors_collection.aggregate([
+        {
+            "$unwind": "$books"
+        },
+        {
+            "$match": {
+                "books.name": { "$regex": name_filter, "$options": "i" }
+            }
+        },
+        {
+            "$count": "total"
+        }
+    ])
+
+    total_books_count = next(total_books, {}).get('total', 0)
+    num_pages = (total_books_count + 19) // 20  # Calculate number of pages
+
+    response_data = {
+        'books': books,
+        'num_pages': num_pages,
+        'current_page': page,
+    }
+
+    return JsonResponse(response_data, safe=False)
 
 def book_detail(request, pk):
     book = get_book_by_id(pk)
