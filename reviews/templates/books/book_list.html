@@ -5,7 +5,12 @@
 
 {% block content %}
 <div class="max-w-6xl mx-auto mt-6">
-    <h1 class="text-3xl font-bold mb-4 text-indigo-600">Books</h1>
+    <div class="flex justify-between items-center mb-20 mt-10">
+        <h1 class="text-4xl font-bold text-indigo-600">Books</h1>
+        <a href="{% url 'book_create' %}" class="inline-block bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-6 py-3 rounded-lg shadow-lg hover:from-indigo-700 hover:to-purple-700 transition duration-300 flex items-center">
+            <i class="fas fa-plus mr-2"></i> Add New Book
+        </a>
+    </div>
     <div class="flex justify-between items-center mb-4">
         <div id="pagination" class="flex space-x-2">
             <!-- Pagination buttons will be loaded here -->
@@ -15,12 +20,9 @@
     <div id="bookContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- Dynamic content will be loaded here -->
     </div>
-    <a href="{% url 'book_create' %}" class="mt-4 inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300">Add new book</a>
 </div>
 
 <script>
-let currentPage = 1;
-
 async function loadBooks(page = currentPage) {
     const nameFilter = document.getElementById('nameFilter').value.toLowerCase();
     
