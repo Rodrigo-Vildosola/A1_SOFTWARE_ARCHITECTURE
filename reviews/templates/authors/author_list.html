@@ -6,43 +6,45 @@
 {% block content %}
 <div class="max-w-6xl mx-auto mt-6">
     <h1 class="text-3xl font-bold mb-4 text-indigo-600">Authors</h1>
-    <div class="overflow-x-auto">
-        <table id="authorTable" class="min-w-full bg-white border border-gray-200">
+    <div class="flex justify-between items-center mb-4">
+        <div id="pagination" class="flex space-x-2">
+            <!-- Pagination buttons will be loaded here -->
+        </div>
+        <input class="p-2 rounded-md shadow-sm border border-gray-300 focus:border-indigo-500" type="text" id="nameFilter" onkeyup="filterTable()" placeholder="Search for names..">
+    </div>
+    <div class="overflow-x-auto shadow-lg rounded-lg">
+        <table id="authorTable" class="min-w-full bg-white">
             <thead>
-                <tr class="bg-gray-100">
-                    <th class="py-2 px-4">
-                        <input class="p-2 rounded-md shadow-sm border border-gray-400" type="text" id="nameFilter" onkeyup="filterTable()" placeholder="Search for names..">
-                    </th>
-                    <th class="py-2 px-4"></th>
-                    <th class="py-2 px-4"></th>
-                    <th class="py-2 px-4"></th>
-                    <th class="py-2 px-4"></th>
-                </tr>
-                <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+                <tr class="bg-indigo-600 text-white uppercase text-sm leading-normal">
                     <th class="py-3 px-6 text-left cursor-pointer">
-                        <a href="#" onclick="toggleSort('name')">Name <span id="sort-name"></span></a>
+                        <a href="#" onclick="toggleSort('name')" class="flex items-center">
+                            <span>Name</span> <span id="sort-name" class="ml-2"></span>
+                        </a>
                     </th>
                     <th class="py-3 px-6 text-left cursor-pointer">
-                        <a href="#" onclick="toggleSort('number_of_books')">Number of Books <span id="sort-number_of_books"></span></a>
+                        <a href="#" onclick="toggleSort('number_of_books')" class="flex items-center">
+                            <span>Number of Books</span> <span id="sort-number_of_books" class="ml-2"></span>
+                        </a>
                     </th>
                     <th class="py-3 px-6 text-left cursor-pointer">
-                        <a href="#" onclick="toggleSort('average_score')">Average Score <span id="sort-average_score"></span></a>
+                        <a href="#" onclick="toggleSort('average_score')" class="flex items-center">
+                            <span>Average Score</span> <span id="sort-average_score" class="ml-2"></span>
+                        </a>
                     </th>
                     <th class="py-3 px-6 text-left cursor-pointer">
-                        <a href="#" onclick="toggleSort('total_sales')">Total Sales <span id="sort-total_sales"></span></a>
+                        <a href="#" onclick="toggleSort('total_sales')" class="flex items-center">
+                            <span>Total Sales</span> <span id="sort-total_sales" class="ml-2"></span>
+                        </a>
                     </th>
                     <th class="py-3 px-6 text-left">Actions</th>
                 </tr>
             </thead>
-            <tbody id="authorTbody" class="text-gray-600 text-sm font-light">
+            <tbody id="authorTbody" class="text-gray-700">
                 <!-- Dynamic content will be loaded here -->
             </tbody>
         </table>
-        <div id="pagination" class="mt-4">
-            <!-- Pagination buttons will be loaded here -->
-        </div>
     </div>
-    <a href="{% url 'author_create' %}" class="mt-4 inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300">Add new author</a>
+    <a href="{% url 'author_create' %}" class="mt-4 inline-block bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition duration-300">Add new author</a>
 </div>
 
 <script>
@@ -84,8 +86,12 @@ async function loadAuthors(sort_by = currentSortBy, page = currentPage) {
             <td class="py-3 px-6 text-left">${author.average_score ? author.average_score.toFixed(2) : 'N/A'}</td>
             <td class="py-3 px-6 text-left">${author.total_sales || 'N/A'}</td>
             <td class="py-3 px-6 text-left">
-                <a href="/author/${author._id}/edit" class="text-yellow-500 hover:underline">Edit</a> |
-                <a href="/author/${author._id}/delete" class="text-red-500 hover:underline">Delete</a>
+                <a href="/author/${author._id}/edit" class="text-yellow-500 hover:text-yellow-600 transition duration-300">
+                    <i class="fas fa-edit"></i> Edit
+                </a> |
+                <a href="/author/${author._id}/delete" class="text-red-500 hover:text-red-600 transition duration-300">
+                    <i class="fas fa-trash-alt"></i> Delete
+                </a>
             </td>
         `;
         tbody.appendChild(tr);
@@ -95,7 +101,7 @@ async function loadAuthors(sort_by = currentSortBy, page = currentPage) {
     pagination.innerHTML = '';
     for (let i = 1; i <= data.num_pages; i++) {
         const button = document.createElement('button');
-        button.className = `px-4 py-2 mx-1 ${i == data.current_page ? 'bg-blue-500 text-white' : 'bg-white text-blue-500'}`;
+        button.className = `px-4 py-2 mx-1 rounded ${i == data.current_page ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-indigo-600 hover:bg-indigo-600 hover:text-white transition duration-300'}`;
         button.innerText = i;
         button.onclick = () => loadAuthors(currentSortBy, i);
         pagination.appendChild(button);
