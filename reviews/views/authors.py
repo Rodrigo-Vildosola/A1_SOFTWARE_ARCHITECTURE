@@ -2,36 +2,39 @@ from django.shortcuts import render, redirect
 from bson.objectid import ObjectId
 from reviews.queries.authors import get_author_with_books_reviews_sales, get_books_by_author
 from reviews.mongo import Mongo
+from django.core.paginator import Paginator
+from django.http import JsonResponse
 
 # MongoDB connection
 db = Mongo().database
 authors_collection = db.object
 
+
 def author_list(request):
+    return render(request, 'authors/author_list.html')
+
+def author_data(request):
     sort_by = request.GET.get('sort_by', 'name')
     order = request.GET.get('order', 'asc')
+    page = int(request.GET.get('page', 1))
+    name_filter = request.GET.get('name_filter', '')
 
-    authors = get_author_with_books_reviews_sales()
+    authors, num_pages = get_author_with_books_reviews_sales(page, sort_by, order, name_filter)
 
-    reverse = True if order == 'desc' else False
+    # Convert ObjectId to string
+    for author in authors:
+        author['_id'] = str(author['_id'])
 
-    if sort_by == 'name':
-        authors = sorted(authors, key=lambda x: x['name'].lower() if x['name'] else '', reverse=reverse)
-    elif sort_by == 'number_of_books':
-        authors = sorted(authors, key=lambda x: x.get('number_of_books', 0), reverse=reverse)
-    elif sort_by == 'average_score':
-        authors = sorted(authors, key=lambda x: x.get('average_score', float('-inf')) if x.get('average_score') is not None else float('-inf'), reverse=reverse)
-    elif sort_by == 'total_sales':
-        authors = sorted(authors, key=lambda x: x.get('total_sales', float('-inf')) if x.get('total_sales') is not None else float('-inf'), reverse=reverse)
-
-    sort_arrows = {
-        'name': '▼' if sort_by == 'name' and order == 'asc' else '▲' if sort_by == 'name' else '',
-        'number_of_books': '▼' if sort_by == 'number_of_books' and order == 'asc' else '▲' if sort_by == 'number_of_books' else '',
-        'average_score': '▼' if sort_by == 'average_score' and order == 'asc' else '▲' if sort_by == 'average_score' else '',
-        'total_sales': '▼' if sort_by == 'total_sales' and order == 'asc' else '▲' if sort_by == 'total_sales' else '',
+    response_data = {
+        'authors': authors,
+        'num_pages': num_pages,
+        'current_page': page,
+        'sort_by': sort_by,
+        'order': order,
     }
 
-    return render(request, 'authors/author_list.html', {'authors': authors, 'sort_by': sort_by, 'order': order, 'sort_arrows': sort_arrows})
+    return JsonResponse(response_data, safe=False)
+
 
 def author_detail(request, pk):
     author = authors_collection.find_one({"_id": ObjectId(pk)})
