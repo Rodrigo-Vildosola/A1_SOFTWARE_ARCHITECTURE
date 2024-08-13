@@ -13,6 +13,16 @@ def get_books_by_author(author_id):
 
 
 def get_author_with_books_reviews_sales(page, sort_by, order, name_filter):
+    # Map the sort_by parameter to the actual field names in the documents
+    sort_fields = {
+        'name': 'name',
+        'number_of_books': 'number_of_books',
+        'average_score': 'average_score',
+        'total_sales': 'total_sales'
+    }
+    
+    sort_field = sort_fields.get(sort_by, 'name')  # Default to 'name' if sort_by is invalid
+
     pipeline = [
         {
             "$addFields": {
@@ -67,7 +77,7 @@ def get_author_with_books_reviews_sales(page, sort_by, order, name_filter):
             }
         },
         {
-            "$sort": { sort_by: 1 if order == 'asc' else -1 }
+            "$sort": { sort_field: 1 if order == 'asc' else -1 }
         },
         {
             "$skip": (page - 1) * 10

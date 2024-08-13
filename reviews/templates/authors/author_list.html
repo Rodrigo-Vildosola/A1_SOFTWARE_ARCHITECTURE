@@ -4,6 +4,35 @@
 {% block title %}Authors{% endblock %}
 
 {% block content %}
+<style>
+/* Spinner CSS */
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border-left-color: #09f;
+  animation: spin 1s ease infinite;
+  margin: auto;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: calc(40px * 10); /* Adjust height to match 10 rows */
+  text-align: center;
+  width: 100%;
+}
+
+</style>
+
 <div class="max-w-6xl mx-auto mt-6">
     <h1 class="text-3xl font-bold mb-4 text-indigo-600">Authors</h1>
     <div class="overflow-x-auto">
@@ -20,16 +49,16 @@
                 </tr>
                 <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
                     <th class="py-3 px-6 text-left cursor-pointer">
-                        <a href="#" onclick="loadAuthors('name')">Name <span id="sort-name"></span></a>
+                        <a href="#" onclick="toggleSort('name')">Name <span id="sort-name"></span></a>
                     </th>
                     <th class="py-3 px-6 text-left cursor-pointer">
-                        <a href="#" onclick="loadAuthors('number_of_books')">Number of Books <span id="sort-number_of_books"></span></a>
+                        <a href="#" onclick="toggleSort('number_of_books')">Number of Books <span id="sort-number_of_books"></span></a>
                     </th>
                     <th class="py-3 px-6 text-left cursor-pointer">
-                        <a href="#" onclick="loadAuthors('average_score')">Average Score <span id="sort-average_score"></span></a>
+                        <a href="#" onclick="toggleSort('average_score')">Average Score <span id="sort-average_score"></span></a>
                     </th>
                     <th class="py-3 px-6 text-left cursor-pointer">
-                        <a href="#" onclick="loadAuthors('total_sales')">Total Sales <span id="sort-total_sales"></span></a>
+                        <a href="#" onclick="toggleSort('total_sales')">Total Sales <span id="sort-total_sales"></span></a>
                     </th>
                     <th class="py-3 px-6 text-left">Actions</th>
                 </tr>
@@ -60,6 +89,13 @@ async function loadAuthors(sort_by = currentSortBy, page = currentPage) {
         page: page,
         name_filter: nameFilter
     });
+
+    document.getElementById('authorTbody').innerHTML = `
+        <tr>
+            <td colspan="5" class="loading-container">
+                <div class="spinner"></div>
+            </td>
+        </tr>`;
 
     const response = await fetch(`/authors/data/?${params.toString()}`);
     const data = await response.json();
@@ -101,7 +137,19 @@ async function loadAuthors(sort_by = currentSortBy, page = currentPage) {
     document.getElementById(`sort-${sort_by}`).innerText = order === 'asc' ? '▲' : '▼';
 }
 
+function toggleSort(column) {
+    if (currentSortBy === column) {
+        currentOrder = currentOrder === 'asc' ? 'desc' : 'asc';
+    } else {
+        currentSortBy = column;
+        currentOrder = 'asc';
+    }
+    currentPage = 1;
+    loadAuthors();
+}
+
 function filterTable() {
+    currentPage = 1;
     loadAuthors();
 }
 
