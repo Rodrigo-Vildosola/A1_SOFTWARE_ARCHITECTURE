@@ -19,23 +19,37 @@ def get_top_rated_books():
                     "author_name": {"$first": "$name"},
                     "author_id": {"$first": "$_id"},
                     "average_score": {"$avg": "$books.reviews.score"},
+                    "reviews": {"$push": "$books.reviews"}
+                }
+            },
+            {
+                "$project": {
+                    "book_name": 1,
+                    "author_name": 1,
+                    "author_id": 1,
+                    "average_score": 1,
+                    "reviews": 1,
                     "highest_rated_review": {
-                        "$first": {
-                            "$cond": {
-                                "if": {"$eq": ["$books.reviews.score", {"$max": "$books.reviews.score"}]},
-                                "then": "$books.reviews",
-                                "else": None
-                            }
-                        }
+                        "$arrayElemAt": [
+                            {
+                                "$filter": {
+                                    "input": "$reviews",
+                                    "as": "review",
+                                    "cond": {"$eq": ["$$review.score", {"$max": "$reviews.score"}]}
+                                }
+                            }, 0
+                        ]
                     },
                     "lowest_rated_review": {
-                        "$first": {
-                            "$cond": {
-                                "if": {"$eq": ["$books.reviews.score", {"$min": "$books.reviews.score"}]},
-                                "then": "$books.reviews",
-                                "else": None
-                            }
-                        }
+                        "$arrayElemAt": [
+                            {
+                                "$filter": {
+                                    "input": "$reviews",
+                                    "as": "review",
+                                    "cond": {"$eq": ["$$review.score", {"$min": "$reviews.score"}]}
+                                }
+                            }, 0
+                        ]
                     }
                 }
             },
@@ -47,8 +61,16 @@ def get_top_rated_books():
                     "author_name": 1,
                     "author_id": 1,
                     "average_score": 1,
-                    "highest_rated_review": 1,
-                    "lowest_rated_review": 1
+                    "highest_rated_review": {
+                        "_id": "$highest_rated_review._id",
+                        "review": "$highest_rated_review.review",
+                        "score": "$highest_rated_review.score"
+                    },
+                    "lowest_rated_review": {
+                         "_id": "$lowest_rated_review._id",
+                        "review": "$lowest_rated_review.review",
+                        "score": "$lowest_rated_review.score"
+                    }
                 }
             }
         ]
