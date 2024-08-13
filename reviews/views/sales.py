@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from bson.objectid import ObjectId
 from reviews.queries.sales import get_all_sales, get_sale_by_id, create_sale, update_sale, delete_sale
-from reviews.utils import authors_collection
+from reviews.utils import collection
 
 def sales_list(request):
     sales = get_all_sales()
@@ -25,7 +25,7 @@ def sale_create(request):
         return redirect('sales_list')
     
     # Fetch only necessary fields (name and id) to avoid loading too much data
-    books = list(authors_collection.aggregate([
+    books = list(collection.aggregate([
         {"$unwind": "$books"},
         {"$project": {"_id": "$books._id", "name": "$books.name"}}
     ]))
@@ -42,7 +42,7 @@ def sale_edit(request, pk):
         return redirect('sales_list')
     
     # Fetch only necessary fields (name and id) to avoid loading too much data
-    books = list(authors_collection.aggregate([
+    books = list(collection.aggregate([
         {"$unwind": "$books"},
         {"$project": {"_id": "$books._id", "name": "$books.name"}}
     ]))

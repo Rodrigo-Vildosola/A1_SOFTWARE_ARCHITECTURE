@@ -4,7 +4,7 @@ from pymongo.errors import PyMongoError
 
 # Initialize database and collection
 db = Mongo().database
-authors_collection = db['object']
+collection = db['object']
 
 def get_all_reviews():
     try:
@@ -23,7 +23,7 @@ def get_all_reviews():
                 }
             }
         ]
-        return list(authors_collection.aggregate(pipeline))
+        return list(collection.aggregate(pipeline))
     except PyMongoError as e:
         print(f"An error occurred: {e}")
         return []
@@ -46,7 +46,7 @@ def get_review_by_id(review_id):
                 }
             }
         ]
-        result = list(authors_collection.aggregate(pipeline))
+        result = list(collection.aggregate(pipeline))
         return result[0] if result else "Review not found"
     except PyMongoError as e:
         print(f"An error occurred: {e}")
@@ -55,7 +55,7 @@ def get_review_by_id(review_id):
 def create_review(book_id, review):
     try:
         review["_id"] = ObjectId()
-        authors_collection.update_one(
+        collection.update_one(
             {'books._id': ObjectId(book_id)},
             {'$push': {'books.$.reviews': review}}
         )
@@ -66,7 +66,7 @@ def create_review(book_id, review):
 
 def update_review(review_id, updated_review):
     try:
-        authors_collection.update_one(
+        collection.update_one(
             {'books.reviews._id': ObjectId(review_id)},
             {'$set': {
                 "books.$[book].reviews.$[review].review": updated_review["review"],
@@ -84,7 +84,7 @@ def update_review(review_id, updated_review):
 
 def delete_review(review_id):
     try:
-        authors_collection.update_one(
+        collection.update_one(
             {'books.reviews._id': ObjectId(review_id)},
             {'$pull': {'books.$[book].reviews': {'_id': ObjectId(review_id)}}},
             array_filters=[

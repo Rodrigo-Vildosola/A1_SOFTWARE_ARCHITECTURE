@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from reviews.utils import authors_collection
+from reviews.utils import collection
 from bson.objectid import ObjectId
 from reviews.queries.reviews import get_all_reviews, get_review_by_id, create_review, update_review, delete_review
 
@@ -27,7 +27,7 @@ def review_create(request):
         return redirect('review_list')
     
     # Fetch only necessary fields (name and id) to avoid loading too much data
-    books = list(authors_collection.aggregate([
+    books = list(collection.aggregate([
         {"$unwind": "$books"},
         {"$project": {"_id": "$books._id", "name": "$books.name"}}
     ]))
@@ -45,7 +45,7 @@ def review_edit(request, pk):
         return redirect('review_list')
     
     # Fetch only necessary fields (name and id) to avoid loading too much data
-    books = list(authors_collection.aggregate([
+    books = list(collection.aggregate([
         {"$unwind": "$books"},
         {"$project": {"_id": "$books._id", "name": "$books.name"}}
     ]))

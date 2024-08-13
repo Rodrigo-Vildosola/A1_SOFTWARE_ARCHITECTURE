@@ -5,7 +5,7 @@ from pymongo.errors import PyMongoError
 
 # MongoDB connection
 db = Mongo().database
-authors_collection = db['object']
+collection = db['object']
 
 def get_top_rated_books():
     try:
@@ -57,7 +57,7 @@ def get_top_rated_books():
                 }
             }
         ]
-        return list(authors_collection.aggregate(pipeline))
+        return list(collection.aggregate(pipeline))
     except PyMongoError as e:
         print(f"An error occurred: {e}")
         return []
@@ -129,7 +129,7 @@ def get_top_selling_books():
         }
     ]
 
-    return list(authors_collection.aggregate(pipeline))
+    return list(collection.aggregate(pipeline))
 
 
 def get_books_aggregate(page, name_filter=''):
@@ -168,7 +168,9 @@ def get_books_aggregate(page, name_filter=''):
             "$limit": 20
         }
     ]
-    return list(authors_collection.aggregate(pipeline))
+    return list(collection.aggregate(pipeline))
+
+
 
 def get_book_by_id(pk):
     pipeline = [
@@ -189,7 +191,7 @@ def get_book_by_id(pk):
             }
         }
     ]
-    book = list(authors_collection.aggregate(pipeline))
+    book = list(collection.aggregate(pipeline))
     return book[0] if book else None
 
 
@@ -214,7 +216,7 @@ def get_reviews_by_book(pk):
             }
         }
     ]
-    return list(authors_collection.aggregate(pipeline))
+    return list(collection.aggregate(pipeline))
 
 def get_sales_by_book(pk):
     pipeline = [
@@ -236,23 +238,23 @@ def get_sales_by_book(pk):
             }
         }
     ]
-    return list(authors_collection.aggregate(pipeline))
+    return list(collection.aggregate(pipeline))
 
 def create_book(author_id, book_data):
     book_data["_id"] = ObjectId()
-    return authors_collection.update_one(
+    return collection.update_one(
         {'_id': ObjectId(author_id)},
         {'$push': {'books': book_data}}
     )
 
 def update_book(pk, data):
-    return authors_collection.update_one(
+    return collection.update_one(
         {'books._id': ObjectId(pk)},
         {'$set': {f'books.$.{key}': value for key, value in data.items()}}
     )
 
 def delete_book(pk):
-    return authors_collection.update_one(
+    return collection.update_one(
         {'books._id': ObjectId(pk)},
         {'$pull': {'books': {'_id': ObjectId(pk)}}}
     )

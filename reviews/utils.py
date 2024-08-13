@@ -3,7 +3,7 @@ from .mongo import Mongo
 
 # MongoDB connection
 db = Mongo().database
-authors_collection = db['object']
+collection = db['object']
 
 def search_books(query, page=1, limit=10):
     skip = (page - 1) * limit
@@ -39,7 +39,7 @@ def search_books(query, page=1, limit=10):
         }
     ]
 
-    search_results = authors_collection.aggregate(pipeline)
+    search_results = collection.aggregate(pipeline)
     
     
     return list(search_results)

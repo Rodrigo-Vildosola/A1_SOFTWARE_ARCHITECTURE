@@ -19,7 +19,16 @@
                         <button type="submit" class="absolute right-0 top-0 h-full px-4 bg-indigo-600 text-white rounded-r-md hover:bg-indigo-700 transition duration-300">Search</button>
                     </form>
                     <div id="searchResults" class="absolute left-0 right-0 bg-white border border-gray-300 rounded-md mt-1 hidden">
-                        <!-- Search results will be dynamically populated here -->
+                        <div id="resultsPagination" class="flex justify-between items-center mx-2 p-2">
+                          <button id="prevPage" class="text-indigo-400 hover:text-indigo-800 flex items-center">
+                              <i class="fas fa-chevron-left"></i>
+                          </button>
+                          <span id="currentPage" class="text-indigo-600 font-semibold">1</span>
+                          <button id="nextPage" class="text-indigo-400 hover:text-indigo-800 flex items-center">
+                              <i class="fas fa-chevron-right"></i>
+                          </button>
+                        </div>
+                        <div id="resultsList"></div>
                     </div>
                 </div>
                 <a href="/top-books" class="bg-gray-700 hover:bg-gray-900 text-white font-semibold py-2 px-4 rounded-md shadow-md hover:from-green-500 hover:to-blue-600 transition duration-300">Top Books</a>
@@ -60,45 +69,80 @@
             }
         });
 
-        // Dynamic search
+        // Dynamic search with pagination
         const searchInput = document.getElementById('searchInput');
         const searchResults = document.getElementById('searchResults');
+        const resultsList = document.getElementById('resultsList');
+        const prevPageBtn = document.getElementById('prevPage');
+        const nextPageBtn = document.getElementById('nextPage');
+        const currentPageSpan = document.getElementById('currentPage');
 
-        searchInput.addEventListener('input', async function() {
+        let currentPage = 1;
+
+        async function fetchSearchResults(page = 1) {
             const query = searchInput.value.toLowerCase();
             if (query.length < 2) {
                 searchResults.classList.add('hidden');
                 return;
             }
 
-            const params = new URLSearchParams({ name_filter: query });
+            const params = new URLSearchParams({ name_filter: query, page: page });
             const response = await fetch(`/books/data/?${params.toString()}`);
             const data = await response.json();
 
             if (data.books.length > 0) {
-                searchResults.innerHTML = data.books.map(book => `
+                resultsList.innerHTML = data.books.map(book => `
                     <a href="/book/${book._id}" class="block px-4 py-2 text-gray-700 hover:bg-gray-100">
                         ${book.name}
                     </a>
                 `).join('');
+                currentPageSpan.textContent = data.current_page;
                 searchResults.classList.remove('hidden');
             } else {
-                searchResults.innerHTML = '<p class="px-4 py-2 text-gray-700">No results found</p>';
+                resultsList.innerHTML = '<p class="px-4 py-2 text-gray-700">No results found</p>';
                 searchResults.classList.remove('hidden');
             }
+
+            prevPageBtn.disabled = data.current_page <= 1;
+            nextPageBtn.disabled = data.current_page >= data.num_pages;
+        }
+
+        searchInput.addEventListener('input', function() {
+            currentPage = 1;
+            fetchSearchResults(currentPage);
+        });
+
+        prevPageBtn.addEventListener('click', function(event) {
+            event.stopPropagation();
+            if (currentPage > 1) {
+                currentPage--;
+                fetchSearchResults(currentPage);
+            }
+        });
+
+        nextPageBtn.addEventListener('click', function(event) {
+            event.stopPropagation();
+            currentPage++;
+            fetchSearchResults(currentPage);
         });
 
         // Hide search results when input is not focused
         searchInput.addEventListener('focus', function() {
             if (searchInput.value.length >= 2) {
-                searchResults.classList.remove('hidden');
+                fetchSearchResults(currentPage);
             }
         });
 
-        searchInput.addEventListener('blur', function() {
-            setTimeout(() => {
+        // Hide search results when clicking outside
+        document.addEventListener('click', function(event) {
+            const isClickInsideSearch = searchInput.contains(event.target) || searchResults.contains(event.target);
+            if (!isClickInsideSearch) {
                 searchResults.classList.add('hidden');
-            }, 200);
+            }
+        });
+
+        searchResults.addEventListener('click', function(event) {
+            event.stopPropagation();
         });
     </script>
 </body>

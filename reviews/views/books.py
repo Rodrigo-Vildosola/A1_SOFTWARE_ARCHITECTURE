@@ -15,7 +15,7 @@ from reviews.queries.books import (
 )
 
 db = Mongo().database
-authors_collection = db.object
+collection = db.object
 
 def top_books(request):
     top_rated_books = get_top_rated_books()
@@ -42,7 +42,7 @@ def book_data(request):
         book['_id'] = str(book['_id'])
         book['author_id'] = str(book['author_id'])
 
-    total_books = authors_collection.aggregate([
+    total_books = collection.aggregate([
         {
             "$unwind": "$books"
         },
@@ -89,7 +89,7 @@ def book_create(request):
         create_book(book)
         return redirect('book_list')
     
-    authors = list(authors_collection.find({}, {"_id": 1, "name": 1}))
+    authors = list(collection.find({}, {"_id": 1, "name": 1}))
     return render(request, 'books/book_form.html', {'authors': authors})
 
 def book_edit(request, pk):
@@ -104,7 +104,7 @@ def book_edit(request, pk):
         update_book(pk, updated_book)
         return redirect('book_list')
     
-    authors = list(authors_collection.find({}, {"_id": 1, "name": 1}))
+    authors = list(collection.find({}, {"_id": 1, "name": 1}))
     return render(request, 'books/book_form.html', {'book': book, 'authors': authors})
 
 def book_delete(request, pk):

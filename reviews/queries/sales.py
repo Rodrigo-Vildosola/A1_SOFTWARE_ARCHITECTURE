@@ -4,7 +4,7 @@ from pymongo.errors import PyMongoError
 
 # Initialize database and collection
 db = Mongo().database
-authors_collection = db['object']
+collection = db['object']
 
 def get_all_sales():
     try:
@@ -22,7 +22,7 @@ def get_all_sales():
                 }
             }
         ]
-        return list(authors_collection.aggregate(pipeline))
+        return list(collection.aggregate(pipeline))
     except PyMongoError as e:
         print(f"An error occurred: {e}")
         return []
@@ -44,7 +44,7 @@ def get_sale_by_id(sale_id):
                 }
             }
         ]
-        result = list(authors_collection.aggregate(pipeline))
+        result = list(collection.aggregate(pipeline))
         return result[0] if result else "Sale not found"
     except PyMongoError as e:
         print(f"An error occurred: {e}")
@@ -53,7 +53,7 @@ def get_sale_by_id(sale_id):
 def create_sale(book_id, sale):
     try:
         sale["_id"] = ObjectId()
-        authors_collection.update_one(
+        collection.update_one(
             {'books._id': ObjectId(book_id)},
             {'$push': {'books.$.sales': sale}}
         )
@@ -64,7 +64,7 @@ def create_sale(book_id, sale):
 
 def update_sale(sale_id, updated_sale):
     try:
-        authors_collection.update_one(
+        collection.update_one(
             {'books.sales._id': ObjectId(sale_id)},
             {'$set': {
                 "books.$[book].sales.$[sale].year": updated_sale["year"],
@@ -81,7 +81,7 @@ def update_sale(sale_id, updated_sale):
 
 def delete_sale(sale_id):
     try:
-        authors_collection.update_one(
+        collection.update_one(
             {'books.sales._id': ObjectId(sale_id)},
             {'$pull': {'books.$[book].sales': {'_id': ObjectId(sale_id)}}},
             array_filters=[

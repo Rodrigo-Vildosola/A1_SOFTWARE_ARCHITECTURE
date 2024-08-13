@@ -4,10 +4,10 @@ from reviews.mongo import Mongo
 
 # MongoDB connection
 db = Mongo().database
-authors_collection = db.object
+collection = db.object
 
 def get_books_by_author(author_id):
-    author = authors_collection.find_one({"_id": ObjectId(author_id)}, {"books": 1})
+    author = collection.find_one({"_id": ObjectId(author_id)}, {"books": 1})
     return author.get("books", []) if author else []
 
 
@@ -98,8 +98,8 @@ def get_author_with_books_reviews_sales(page, sort_by, order, name_filter):
         }
     ]
 
-    total_count_result = list(authors_collection.aggregate(total_pipeline))
+    total_count_result = list(collection.aggregate(total_pipeline))
     total_count = total_count_result[0]['total'] if total_count_result else 0
     num_pages = (total_count + 9) // 10  # Calculate number of pages
 
-    return list(authors_collection.aggregate(pipeline)), num_pages
+    return list(collection.aggregate(pipeline)), num_pages
