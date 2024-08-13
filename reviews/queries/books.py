@@ -1,74 +1,66 @@
 from bson.objectid import ObjectId
 from reviews.mongo import Mongo
+from pymongo.errors import PyMongoError
+
 
 # MongoDB connection
 db = Mongo().database
 authors_collection = db['object']
 
 def get_top_rated_books():
-    pipeline = [
-        {
-            "$unwind": "$books"
-        },
-        {
-            "$unwind": "$books.reviews"
-        },
-        {
-            "$group": {
-                "_id": "$books._id",
-                "title": { "$first": "$books.name" },
-                "author_id": { "$first": "$_id" },
-                "average_rating": { "$avg": { "$toDouble": "$books.reviews.score" } },
-                "reviews": { "$push": "$books.reviews" }
-            }
-        },
-        {
-            "$sort": { "average_rating": -1 }
-        },
-        {
-            "$limit": 10
-        },
-        {
-            "$lookup": {
-                "from": "authors",
-                "localField": "author_id",
-                "foreignField": "_id",
-                "as": "author_info"
-            }
-        },
-        {
-            "$unwind": "$author_info"
-        },
-        {
-            "$project": {
-                "title": 1,
-                "author": "$author_info.name",
-                "author_id": "$author_info._id",
-                "average_rating": 1,
-                "most_popular_review": {
-                    "$arrayElemAt": [
-                        { "$sortArray": { "input": "$reviews", "sortBy": { "number_of_upvotes": -1 } } },
-                        0
-                    ]
-                },
-                "highest_rated_review": {
-                    "$arrayElemAt": [
-                        { "$sortArray": { "input": "$reviews", "sortBy": { "score": -1 } } },
-                        0
-                    ]
-                },
-                "lowest_rated_review": {
-                    "$arrayElemAt": [
-                        { "$sortArray": { "input": "$reviews", "sortBy": { "score": 1 } } },
-                        0
-                    ]
+    try:
+        pipeline = [
+            {"$unwind": "$books"},
+            {"$unwind": "$books.reviews"},
+            {
+                "$group": {
+                    "_id": {
+                        "book_id": "$books._id",
+                        "book_name": "$books.name",
+                        "author_name": "$name",
+                        "author_id": "$_id"
+                    },
+                    "average_score": {"$avg": "$books.reviews.score"},
+                    "highest_rated_review": {"$max": "$books.reviews.score"},
+                    "lowest_rated_review": {"$min": "$books.reviews.score"},
+                    "most_popular_highest_review": {
+                        "$first": {
+                            "$cond": {
+                                "if": {"$eq": ["$books.reviews.score", {"$max": "$books.reviews.score"}]},
+                                "then": "$books.reviews",
+                                "else": None
+                            }
+                        }
+                    },
+                    "most_popular_lowest_review": {
+                        "$first": {
+                            "$cond": {
+                                "if": {"$eq": ["$books.reviews.score", {"$min": "$books.reviews.score"}]},
+                                "then": "$books.reviews",
+                                "else": None
+                            }
+                        }
+                    }
+                }
+            },
+            {"$sort": {"average_score": -1}},
+            {"$limit": 10},
+            {
+                "$project": {
+                    "book_id": "$_id.book_id",
+                    "book_name": "$_id.book_name",
+                    "author_name": "$_id.author_name",
+                    "author_id": "$_id.author_id",
+                    "average_score": 1,
+                    "most_popular_highest_review": 1,
+                    "most_popular_lowest_review": 1
                 }
             }
-        }
-    ]
-
-    return list(authors_collection.aggregate(pipeline))
-
+        ]
+        return list(authors_collection.aggregate(pipeline))
+    except PyMongoError as e:
+        print(f"An error occurred: {e}")
+        return []
 
 def get_top_selling_books():
     pipeline = [

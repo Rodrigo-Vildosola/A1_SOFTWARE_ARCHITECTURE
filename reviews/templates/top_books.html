@@ -36,10 +36,10 @@
                             </td>
                             <td class="py-3 px-6 text-left">{{ book.average_rating }}</td>
                             <td class="py-3 px-6 text-left">
-                                <a href="{% url 'review_detail' book.most_popular_review|get_id %}" class="text-indigo-600 hover:underline">{{ book.most_popular_review.review }}</a>
+                                <a href="{% url 'review_detail' book.most_popular_highest_review|get_id %}" class="text-indigo-600 hover:underline">{{ book.most_popular_highest_review.review }}</a>
                             </td>
                             <td class="py-3 px-6 text-left">
-                                <a href="{% url 'review_detail' book.highest_rated_review|get_id %}" class="text-indigo-600 hover:underline">{{ book.highest_rated_review.review }}</a>
+                                <a href="{% url 'review_detail' book.most_popular_lowest_review|get_id %}" class="text-indigo-600 hover:underline">{{ book.most_popular_lowest_review.review }}</a>
                             </td>
                             <td class="py-3 px-6 text-left">
                                 <a href="{% url 'review_detail' book.lowest_rated_review|get_id %}" class="text-indigo-600 hover:underline">{{ book.lowest_rated_review.review }}</a>

@@ -19,7 +19,8 @@ authors_collection = db.object
 def top_books(request):
     top_rated_books = get_top_rated_books()
     top_selling_books = get_top_selling_books()
-    print(top_selling_books[0])
+    for i in top_rated_books:
+        print(i)
     context = {
         'top_rated_books': top_rated_books,
         'top_selling_books': top_selling_books,
