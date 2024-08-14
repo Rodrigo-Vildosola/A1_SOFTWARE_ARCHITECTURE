@@ -4,76 +4,83 @@
 {% block title %}Book Detail{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto mt-8 bg-white p-8 rounded-lg shadow-lg">
-    <h1 class="text-4xl font-bold mb-6 text-indigo-600 flex items-center">
-        <i class="fas fa-book mr-2"></i>{{ book.name }}
-    </h1>
-    <div class="mb-8">
-        <p class="text-gray-700 mb-4">
-            <i class="fas fa-align-left text-indigo-600 mr-2"></i><strong>Summary:</strong> {{ book.summary }}
-        </p>
-        <p class="text-gray-700 mb-4">
-            <i class="fas fa-calendar-alt text-indigo-600 mr-2"></i><strong>Date of Publication:</strong> {{ book.date_of_publication }}
-        </p>
-        <p class="text-gray-700 mb-4">
-            <i class="fas fa-chart-line text-indigo-600 mr-2"></i><strong>Number of Sales:</strong> {{ book.number_of_sales }}
-        </p>
-        <p class="text-gray-700 mb-4">
-            <i class="fas fa-user text-indigo-600 mr-2"></i><strong>Author:</strong> 
-            <a href="{% url 'author_detail' book.author_id %}" class="text-indigo-600 hover:underline">{{ book.author_name }}</a>
-        </p>
-    </div>
-
-    <div class="mb-8">
-        <div class="flex justify-between items-center mb-4">
-            <h2 class="text-3xl font-bold text-blue-600">Reviews</h2>
-            <a href="{% url 'review_create_for_book' book|get_id %}" class="bg-gradient-to-r from-green-400 to-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:from-green-500 hover:to-blue-600 transition duration-300 flex items-center">
-                <i class="fas fa-plus mr-2"></i> Add New Review
-            </a>
-        </div>
-        {% if reviews %}
-            <div class="space-y-4">
-                {% for review in reviews %}
-                    <div class="bg-gray-100 p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300 border border-gray-200">
-                        <p class="text-gray-700 mb-2"><i class="fas fa-star text-yellow-500 mr-2"></i><strong>Score:</strong> {{ review.score }}</p>
-                        <p class="text-gray-700 mb-4">{{ review.review }}</p>
-                        <p class="text-gray-700"><i class="fas fa-thumbs-up text-green-500 mr-2"></i><strong>Upvotes:</strong> {{ review.number_of_upvotes }}</p>
-                    </div>
-                {% endfor %}
+<div class="max-w-7xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden mt-6">
+    <div class="flex flex-col md:flex-row">
+        <!-- Book Description Section -->
+        <div class="w-full md:w-1/3 bg-gradient-to-r from-gray-50 to-gray-100 p-8">
+            <h1 class="text-4xl font-bold mb-6 text-purple-600 flex items-center">
+                <i class="fas fa-book mr-2"></i>{{ book.name }}
+            </h1>
+            <p class="text-gray-700 mb-4">
+                <i class="fas fa-align-left text-indigo-600 mr-2"></i><strong>Summary:</strong> {{ book.summary }}
+            </p>
+            <p class="text-gray-700 mb-4">
+                <i class="fas fa-calendar-alt text-indigo-600 mr-2"></i><strong>Date of Publication:</strong> {{ book.date_of_publication }}
+            </p>
+            <p class="text-gray-700 mb-4">
+                <i class="fas fa-chart-line text-indigo-600 mr-2"></i><strong>Number of Sales:</strong> {{ book.number_of_sales }}
+            </p>
+            <p class="text-gray-700 mb-4">
+                <i class="fas fa-user text-indigo-600 mr-2"></i><strong>Author:</strong> 
+                <a href="{% url 'author_detail' book.author_id %}" class="text-indigo-600 hover:underline">{{ book.author_name }}</a>
+            </p>
+            <div class="mt-6 flex space-x-4">
+                <a href="{% url 'book_edit' book|get_id %}" class="bg-gradient-to-r from-yellow-400 to-yellow-500 text-white px-6 py-3 rounded-lg shadow-lg hover:from-yellow-500 hover:to-yellow-600 transition duration-300 flex items-center">
+                    <i class="fas fa-edit mr-2"></i> Edit
+                </a>
+                <a href="{% url 'book_delete' book|get_id %}" class="bg-gradient-to-r from-red-400 to-red-500 text-white px-6 py-3 rounded-lg shadow-lg hover:from-red-500 hover:to-red-600 transition duration-300 flex items-center">
+                    <i class="fas fa-trash-alt mr-2"></i> Delete
+                </a>
             </div>
-        {% else %}
-            <p class="text-gray-700">No reviews available.</p>
-        {% endif %}
-    </div>
-
-    <div class="mb-8">
-        <div class="flex justify-between items-center mb-4">
-            <h2 class="text-3xl font-bold text-blue-600">Sales</h2>
-            <a href="{% url 'sale_create_for_book' book|get_id %}" class="bg-gradient-to-r from-green-400 to-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:from-green-500 hover:to-blue-600 transition duration-300 flex items-center">
-                <i class="fas fa-plus mr-2"></i> Add New Sale
-            </a>
         </div>
-        {% if sales %}
-            <div class="space-y-4">
-                {% for sale in sales %}
-                    <div class="bg-gray-100 p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300 border border-gray-200">
-                        <p class="text-gray-700 mb-2"><i class="fas fa-calendar-alt text-indigo-600 mr-2"></i><strong>Year:</strong> {{ sale.year }}</p>
-                        <p class="text-gray-700"><i class="fas fa-dollar-sign text-green-500 mr-2"></i><strong>Sales:</strong> {{ sale.sales }}</p>
-                    </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <p class="text-gray-700">No sales data available.</p>
-        {% endif %}
-    </div>
 
-    <div class="mt-6 flex space-x-4">
-        <a href="{% url 'book_edit' book|get_id %}" class="bg-gradient-to-r from-yellow-400 to-yellow-500 text-white px-6 py-3 rounded-lg shadow-lg hover:from-yellow-500 hover:to-yellow-600 transition duration-300 flex items-center">
-            <i class="fas fa-edit mr-2"></i> Edit
-        </a>
-        <a href="{% url 'book_delete' book|get_id %}" class="bg-gradient-to-r from-red-400 to-red-500 text-white px-6 py-3 rounded-lg shadow-lg hover:from-red-500 hover:to-red-600 transition duration-300 flex items-center">
-            <i class="fas fa-trash-alt mr-2"></i> Delete
-        </a>
+        <!-- Reviews and Sales Section -->
+        <div class="w-full md:w-2/3 p-8">
+            <div class="mb-8">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-3xl font-bold text-blue-600">Reviews</h2>
+                    <a href="{% url 'review_create_for_book' book|get_id %}" class="bg-gradient-to-r from-green-400 to-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:from-green-500 hover:to-blue-600 transition duration-300 flex items-center">
+                        <i class="fas fa-plus mr-2"></i> Add New Review
+                    </a>
+                </div>
+                {% if reviews %}
+                    <div class="space-y-4">
+                        {% for review in reviews %}
+                            <div class="bg-gray-100 p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300 border border-gray-200">
+                                <p class="text-gray-700 mb-2"><i class="fas fa-star text-yellow-500 mr-2"></i><strong>Score:</strong> {{ review.score }}</p>
+                                <p class="text-gray-700 mb-4">{{ review.review }}</p>
+                                <p class="text-gray-700"><i class="fas fa-thumbs-up text-green-500 mr-2"></i><strong>Upvotes:</strong> {{ review.number_of_upvotes }}</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-gray-700">No reviews available.</p>
+                {% endif %}
+            </div>
+
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-blue-600 mb-4">Sales Timeline</h2>
+                {% if sales %}
+                    <div class="relative">
+                        <div class="border-r-2 border-gray-300 absolute h-full top-0" style="left: 50%"></div>
+                        <ul class="list-none m-0 p-0">
+                            {% for sale in sales %}
+                                <li class="mb-8">
+                                    <div class="flex items-center w-full justify-{{ forloop.counter|divisibleby:2|yesno:'start,end' }}">
+                                        <div class="w-5/12 {{ forloop.counter|divisibleby:2|yesno:'ml-auto mr-2,ml-2 mr-auto' }} bg-white p-4 rounded-lg shadow-lg border border-gray-200">
+                                            <p class="text-gray-700"><i class="fas fa-calendar-alt text-indigo-600 mr-2"></i><strong>Year:</strong> {{ sale.year }}</p>
+                                            <p class="text-gray-700"><i class="fas fa-dollar-sign text-green-500 mr-2"></i><strong>Sales:</strong> {{ sale.sales }}</p>
+                                        </div>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% else %}
+                    <p class="text-gray-700">No sales data available.</p>
+                {% endif %}
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
