@@ -5,26 +5,39 @@
 
 {% block content %}
 <div class="max-w-4xl mx-auto mt-8 bg-white p-8 rounded-lg shadow-lg">
-    <h1 class="text-3xl font-bold mb-6 text-indigo-600">{{ book.name }}</h1>
-    <div class="mb-4">
-        <p class="text-gray-700 mb-2"><strong>Summary:</strong> {{ book.summary }}</p>
-        <p class="text-gray-700 mb-2"><strong>Date of Publication:</strong> {{ book.date_of_publication }}</p>
-        <p class="text-gray-700 mb-2"><strong>Number of Sales:</strong> {{ book.number_of_sales }}</p>
-        <p class="text-gray-700 mb-2">
-            <strong>Author:</strong> 
+    <h1 class="text-4xl font-bold mb-6 text-indigo-600 flex items-center">
+        <i class="fas fa-book mr-2"></i>{{ book.name }}
+    </h1>
+    <div class="mb-8">
+        <p class="text-gray-700 mb-4">
+            <i class="fas fa-align-left text-indigo-600 mr-2"></i><strong>Summary:</strong> {{ book.summary }}
+        </p>
+        <p class="text-gray-700 mb-4">
+            <i class="fas fa-calendar-alt text-indigo-600 mr-2"></i><strong>Date of Publication:</strong> {{ book.date_of_publication }}
+        </p>
+        <p class="text-gray-700 mb-4">
+            <i class="fas fa-chart-line text-indigo-600 mr-2"></i><strong>Number of Sales:</strong> {{ book.number_of_sales }}
+        </p>
+        <p class="text-gray-700 mb-4">
+            <i class="fas fa-user text-indigo-600 mr-2"></i><strong>Author:</strong> 
             <a href="{% url 'author_detail' book.author_id %}" class="text-indigo-600 hover:underline">{{ book.author_name }}</a>
         </p>
     </div>
 
-    <div class="mb-6">
-        <h2 class="text-2xl font-bold mb-4 text-indigo-600">Reviews</h2>
+    <div class="mb-8">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-3xl font-bold text-blue-600">Reviews</h2>
+            <a href="{% url 'review_create_for_book' book|get_id %}" class="bg-gradient-to-r from-green-400 to-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:from-green-500 hover:to-blue-600 transition duration-300 flex items-center">
+                <i class="fas fa-plus mr-2"></i> Add New Review
+            </a>
+        </div>
         {% if reviews %}
             <div class="space-y-4">
                 {% for review in reviews %}
-                    <div class="bg-gray-100 p-4 rounded-lg shadow-md">
-                        <p class="text-gray-700"><strong>Score:</strong> {{ review.score }}</p>
-                        <p class="text-gray-700">{{ review.review }}</p>
-                        <p class="text-gray-700"><strong>Upvotes:</strong> {{ review.number_of_upvotes }}</p>
+                    <div class="bg-gray-100 p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300 border border-gray-200">
+                        <p class="text-gray-700 mb-2"><i class="fas fa-star text-yellow-500 mr-2"></i><strong>Score:</strong> {{ review.score }}</p>
+                        <p class="text-gray-700 mb-4">{{ review.review }}</p>
+                        <p class="text-gray-700"><i class="fas fa-thumbs-up text-green-500 mr-2"></i><strong>Upvotes:</strong> {{ review.number_of_upvotes }}</p>
                     </div>
                 {% endfor %}
             </div>
@@ -33,14 +46,19 @@
         {% endif %}
     </div>
 
-    <div class="mb-6">
-        <h2 class="text-2xl font-bold mb-4 text-indigo-600">Sales</h2>
+    <div class="mb-8">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-3xl font-bold text-blue-600">Sales</h2>
+            <a href="{% url 'sale_create_for_book' book|get_id %}" class="bg-gradient-to-r from-green-400 to-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:from-green-500 hover:to-blue-600 transition duration-300 flex items-center">
+                <i class="fas fa-plus mr-2"></i> Add New Sale
+            </a>
+        </div>
         {% if sales %}
             <div class="space-y-4">
                 {% for sale in sales %}
-                    <div class="bg-gray-100 p-4 rounded-lg shadow-md">
-                        <p class="text-gray-700"><strong>Year:</strong> {{ sale.year }}</p>
-                        <p class="text-gray-700"><strong>Sales:</strong> {{ sale.sales }}</p>
+                    <div class="bg-gray-100 p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300 border border-gray-200">
+                        <p class="text-gray-700 mb-2"><i class="fas fa-calendar-alt text-indigo-600 mr-2"></i><strong>Year:</strong> {{ sale.year }}</p>
+                        <p class="text-gray-700"><i class="fas fa-dollar-sign text-green-500 mr-2"></i><strong>Sales:</strong> {{ sale.sales }}</p>
                     </div>
                 {% endfor %}
             </div>
@@ -50,8 +68,12 @@
     </div>
 
     <div class="mt-6 flex space-x-4">
-        <a href="{% url 'book_edit' book|get_id %}" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 transition duration-300">Edit</a>
-        <a href="{% url 'book_delete' book|get_id %}" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition duration-300">Delete</a>
+        <a href="{% url 'book_edit' book|get_id %}" class="bg-gradient-to-r from-yellow-400 to-yellow-500 text-white px-6 py-3 rounded-lg shadow-lg hover:from-yellow-500 hover:to-yellow-600 transition duration-300 flex items-center">
+            <i class="fas fa-edit mr-2"></i> Edit
+        </a>
+        <a href="{% url 'book_delete' book|get_id %}" class="bg-gradient-to-r from-red-400 to-red-500 text-white px-6 py-3 rounded-lg shadow-lg hover:from-red-500 hover:to-red-600 transition duration-300 flex items-center">
+            <i class="fas fa-trash-alt mr-2"></i> Delete
+        </a>
     </div>
 </div>
 {% endblock %}

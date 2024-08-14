@@ -101,13 +101,13 @@ def book_detail(request, pk):
 
 def book_create(request):
     if request.method == "POST":
+        author_id = ObjectId(request.POST.get('author_id_hidden'))
         book = {
             "name": request.POST.get('name'),
             "summary": request.POST.get('summary'),
             "date_of_publication": request.POST.get('date_of_publication'),
-            "author_id": ObjectId(request.POST.get('author_id'))
         }
-        create_book(book)
+        create_book(author_id, book)
         return redirect('book_list')
     
     authors = list(collection.find({}, {"_id": 1, "name": 1}))
@@ -116,13 +116,13 @@ def book_create(request):
 
 def book_create_for_author(request, author_id):
     if request.method == "POST":
+        author_id = ObjectId(author_id)
         book = {
             "name": request.POST.get('name'),
             "summary": request.POST.get('summary'),
             "date_of_publication": request.POST.get('date_of_publication'),
-            "author_id": ObjectId(author_id)
         }
-        create_book(book)
+        create_book(author_id, book)
         return redirect('author_detail', pk=author_id)
     
     author = collection.find_one({"_id": ObjectId(author_id)}, {"_id": 1, "name": 1})

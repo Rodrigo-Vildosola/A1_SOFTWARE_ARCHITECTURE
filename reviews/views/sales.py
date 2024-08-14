@@ -50,6 +50,24 @@ def sale_create(request):
     ]))
     return render(request, 'sales/sale_form.html', {'books': books})
 
+def sale_create_for_book(request, book_id):
+    if request.method == "POST":
+        book_id = ObjectId(book_id)
+        sale = {
+            "year": int(request.POST.get('year')),
+            "sales": int(request.POST.get('sales'))
+        }
+        create_sale(book_id, sale)
+        return redirect('sales_list')
+    
+    # Fetch only necessary fields (name and id) to avoid loading too much data
+    books = list(collection.aggregate([
+        {"$unwind": "$books"},
+        {"$project": {"_id": "$books._id", "name": "$books.name"}}
+    ]))
+    return render(request, 'sales/sale_form.html', {'books': books})
+
+
 def sale_edit(request, pk):
     sale = get_sale_by_id(pk)
     if request.method == "POST":

@@ -52,6 +52,25 @@ def review_create(request):
     ]))
     return render(request, 'reviews/review_form.html', {'books': books})
 
+def review_create_for_book(request, book_id):
+    if request.method == "POST":
+        book_id = ObjectId(book_id)
+        review = {
+            "review": request.POST.get('review'),
+            "score": int(request.POST.get('score')),
+            "number_of_upvotes": int(request.POST.get('number_of_upvotes'))
+        }
+        create_review(book_id, review)
+        return redirect('review_list')
+    
+    # Fetch only necessary fields (name and id) to avoid loading too much data
+    books = list(collection.aggregate([
+        {"$unwind": "$books"},
+        {"$project": {"_id": "$books._id", "name": "$books.name"}}
+    ]))
+    return render(request, 'reviews/review_form.html', {'books': books})
+
+
 def review_edit(request, pk):
     review = get_review_by_id(pk)
     if request.method == "POST":
