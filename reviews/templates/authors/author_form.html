@@ -1,29 +1,66 @@
 {% extends "base_generic.html" %}
+{% load custom_filters %}
 
 {% block title %}{% if author %}Edit Author{% else %}Add Author{% endif %}{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden mt-6 p-6">
-    <h1 class="text-3xl font-bold mb-4 text-indigo-600">{% if author %}Edit Author{% else %}Add Author{% endif %}</h1>
-    <form method="post" class="space-y-4">
+<div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden mt-6 p-8">
+    <h1 class="text-4xl font-bold mb-6 text-indigo-600 flex items-center">
+        <i class="fas fa-user-edit mr-4"></i>{% if author %}Edit Author{% else %}Add Author{% endif %}
+    </h1>
+    <form method="post" class="space-y-6">
         {% csrf_token %}
-        <div>
-            <label for="name" class="block text-gray-700">Name</label>
-            <input type="text" id="name" name="name" value="{% if author %}{{ author.name }}{% endif %}" class="mt-1 p-2 block w-full border border-gray-300 rounded-md shadow-sm">
+        <div class="space-y-2">
+            <label for="name" class="block text-gray-700 flex items-center"><i class="fas fa-signature mr-2"></i>Name</label>
+            <input type="text" id="name" name="name" value="{% if author %}{{ author.name }}{% endif %}" class="mt-1 p-2 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
         </div>
-        <div>
-            <label for="date_of_birth" class="block text-gray-700">Date of Birth</label>
-            <input type="date" id="date_of_birth" name="date_of_birth" value="{% if author %}{{ author.date_of_birth|date:'Y-m-d' }}{% endif %}" class="mt-1 p-2 block w-full border border-gray-300 rounded-md shadow-sm">
+        <div class="space-y-2">
+            <label for="date_of_birth" class="block text-gray-700 flex items-center"><i class="fas fa-calendar-alt mr-2"></i>Date of Birth</label>
+            <input type="text" id="date_of_birth" name="date_of_birth" value="{% if author %}{{ author.date_of_birth|format_date }}{% endif %}" class="mt-1 p-2 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 datepicker">
         </div>
-        <div>
-            <label for="country_of_origin" class="block text-gray-700">Country of Origin</label>
-            <input type="text" id="country_of_origin" name="country_of_origin" value="{% if author %}{{ author.country_of_origin }}{% endif %}" class="mt-1 p-2 block w-full border border-gray-300 rounded-md shadow-sm">
+        <div class="space-y-2">
+            <label for="country_of_origin" class="block text-gray-700 flex items-center"><i class="fas fa-globe mr-2"></i>Country of Origin</label>
+            <input type="text" id="country_of_origin" name="country_of_origin" value="{% if author %}{{ author.country_of_origin }}{% endif %}" class="mt-1 p-2 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
         </div>
-        <div>
-            <label for="short_description" class="block text-gray-700">Short Description</label>
-            <textarea id="short_description" name="short_description" class="mt-1 p-2 block w-full border border-gray-300 rounded-md shadow-sm">{% if author %}{{ author.short_description }}{% endif %}</textarea>
+        <div class="space-y-2">
+            <label for="short_description" class="block text-gray-700 flex items-center"><i class="fas fa-info-circle mr-2"></i>Short Description</label>
+            <textarea id="short_description" name="short_description" class="mt-1 p-2 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 auto-resize">{% if author %}{{ author.short_description }}{% endif %}</textarea>
         </div>
-        <button type="submit" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300">Save</button>
+        <button type="submit" class="mt-4 bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-6 py-3 rounded-lg shadow-lg hover:from-blue-600 hover:to-indigo-600 transition duration-300 flex items-center">
+            <i class="fas fa-save mr-2"></i> Save
+        </button>
     </form>
 </div>
+
+<!-- Include Flatpickr CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+<!-- Include Flatpickr JS -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+    // Initialize Flatpickr on the date input
+    flatpickr(".datepicker", {
+        altInput: true,
+        altFormat: "F j, Y",
+        dateFormat: "Y-m-d",
+        defaultDate: "{% if author %}{{ author.date_of_birth|format_date }}{% endif %}"
+    });
+
+    // Auto resize textarea
+    document.addEventListener('input', function (event) {
+        if (event.target.classList.contains('auto-resize')) {
+            event.target.style.height = 'auto';
+            event.target.style.height = (event.target.scrollHeight) + 'px';
+        }
+    }, false);
+
+    // Trigger auto resize on page load
+    document.addEventListener('DOMContentLoaded', function () {
+        const textareas = document.querySelectorAll('.auto-resize');
+        textareas.forEach(textarea => {
+            textarea.style.height = 'auto';
+            textarea.style.height = (textarea.scrollHeight) + 'px';
+        });
+    });
+</script>
 {% endblock %}
