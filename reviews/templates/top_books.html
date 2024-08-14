@@ -7,7 +7,7 @@
 <h1 class="text-3xl font-bold mb-6 text-indigo-600">Top Books</h1>
 
 <div class="mb-8">
-    <div class="flex justify-center mb-4">
+    <div class="flex justify-center">
         <button class="tab-button bg-indigo-600 text-white px-4 py-2 rounded-tl-lg rounded-tr-lg focus:outline-none" onclick="openTab(event, 'top-rated')">
             <i class="fas fa-star mr-2"></i>Top 10 Rated Books
         </button>
@@ -45,6 +45,7 @@
                         <th class="py-3 px-6 text-left"><i class="fas fa-dollar-sign mr-2"></i>Total Sales</th>
                         <th class="py-3 px-6 text-left"><i class="fas fa-coins mr-2"></i>Total Sales by Author</th>
                         <th class="py-3 px-6 text-left"><i class="fas fa-calendar-alt mr-2"></i>Top 5 of Publication Year</th>
+                        <th class="py-3 px-6 text-left"><i class="fas fa-tools mr-2"></i>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="topSellingBooks" class="text-gray-700 text-sm font-light">
@@ -109,10 +110,8 @@
     }
 
     async function fetchTopSellingBooks(page = 1) {
-        const nameFilter = document.getElementById('nameFilter').value.toLowerCase();
         const params = new URLSearchParams({
-            page: page,
-            name_filter: nameFilter
+            page: page
         });
 
         const response = await fetch(`/top-books/top-selling/?${params.toString()}`);
@@ -131,7 +130,7 @@
                 </td>
                 <td class="py-3 px-6 text-left">${book.total_sales}</td>
                 <td class="py-3 px-6 text-left">${book.author_total_sales}</td>
-                <td class="py-3 px-6 text-left">${book.top_5_publication_year}</td>
+                <td class="py-3 px-6 text-left">${book.top_5_publication_year.join(', ')}</td>
                 <td class="py-3 px-6 text-left text-lg flex space-x-2">
                     <a href="/sale/${book._id}" class="text-blue-500 hover:text-blue-600 transition duration-300 p-2 border border-blue-500 rounded-lg hover:bg-blue-100"><i class="fas fa-eye"></i></a>
                     <a href="/sale/${book._id}/edit" class="text-yellow-500 hover:text-yellow-600 transition duration-300 p-2 border border-yellow-500 rounded-lg hover:bg-yellow-100"><i class="fas fa-edit"></i></a>

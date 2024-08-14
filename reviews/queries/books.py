@@ -88,7 +88,6 @@ def get_top_selling_books(page=1, name_filter=''):
                     "author_name": {"$first": "$name"},
                     "author_id": {"$first": "$_id"},
                     "total_sales": {"$sum": "$books.sales.sales"},
-                    "author_total_sales": {"$sum": "$books.sales.sales"},
                     "top_5_publication_year": {"$push": "$books.sales.year"}
                 }
             },
@@ -98,99 +97,24 @@ def get_top_selling_books(page=1, name_filter=''):
                     "author_name": 1,
                     "author_id": 1,
                     "total_sales": 1,
-                    "author_total_sales": 1,
                     "top_5_publication_year": {"$slice": ["$top_5_publication_year", 5]}
                 }
             },
             {"$sort": {"total_sales": -1}},
-            {"$skip": (page - 1) * 10},   # Adjust skip and limit for pagination
-            {"$limit": 10}                # Adjust limit for pagination
-        ]
-        
-        total_books_pipeline = [
-            {"$unwind": "$books"},
-            {"$unwind": "$books.sales"},
-            {"$group": {"_id": "$books._id"}},
-            {"$count": "total"}
+            {"$limit": 50}  # Limit the total number of books to top 50
         ]
 
         books = list(collection.aggregate(pipeline))
-        total_books_count = next(collection.aggregate(total_books_pipeline), {}).get('total', 0)
 
-        return books, total_books_count
+        total_books_count = len(books)  # The total number of top 50 books
+        paginated_books = books[(page - 1) * 10: page * 10]  # Paginate the results
+
+        return paginated_books, total_books_count
     except PyMongoError as e:
         print(f"An error occurred: {e}")
         return [], 0
 
 
-# def get_top_selling_books():
-#     pipeline = [
-#         {
-#             "$unwind": "$books"
-#         },
-#         {
-#             "$unwind": {
-#                 "path": "$books.sales",
-#                 "preserveNullAndEmptyArrays": True
-#             }
-#         },
-#         {
-#             "$group": {
-#                 "_id": "$books._id",
-#                 "title": {"$first": "$books.name"},
-#                 "author_id": {"$first": "$_id"},
-#                 "total_sales": {"$sum": {"$convert": {"input": "$books.sales.sales", "to": "int", "onError": 0, "onNull": 0}}},
-#                 "publication_year": {"$first": {"$year": {"$dateFromString": {"dateString": "$books.date_of_publication"}}}}
-#             }
-#         },
-#         {
-#             "$sort": {"total_sales": -1}
-#         },
-#         {
-#             "$limit": 50
-#         },
-#         {
-#             "$lookup": {
-#                 "from": "authors",
-#                 "localField": "author_id",
-#                 "foreignField": "_id",
-#                 "as": "author_info"
-#             }
-#         },
-#         {
-#             "$unwind": "$author_info"
-#         },
-#         {
-#             "$group": {
-#                 "_id": "$_id",
-#                 "title": {"$first": "$title"},
-#                 "author": {"$first": "$author_info.name"},
-#                 "author_id": {"$first": "$author_info._id"},
-#                 "total_sales": {"$first": "$total_sales"},
-#                 "publication_year": {"$first": "$publication_year"},
-#                 "is_top_5_publication_year": {
-#                     "$first": {
-#                         "$cond": {
-#                             "if": {"$lte": ["$publication_year", 5]},
-#                             "then": "Yes",
-#                             "else": "No"
-#                         }
-#                     }
-#                 }
-#             }
-#         },
-#         {
-#             "$project": {
-#                 "title": 1,
-#                 "author": 1,
-#                 "author_id": 1,
-#                 "total_sales": 1,
-#                 "is_top_5_publication_year": 1
-#             }
-#         }
-#     ]
-
-#     return list(collection.aggregate(pipeline))
 
 
 def get_books_aggregate(page, name_filter=''):
