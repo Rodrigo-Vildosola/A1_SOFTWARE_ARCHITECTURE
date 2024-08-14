@@ -23,7 +23,6 @@ def top_books(request):
 def top_rated_books(request):
     top_rated_books = get_top_rated_books()
     for book in top_rated_books:
-        print(book)
         book['_id'] = str(book['_id'])
         book['author_id'] = str(book['author_id'])
         if book.get('highest_rated_review'):
@@ -96,7 +95,6 @@ def book_detail(request, pk):
     # Calculate the total sales for the book
     total_sales = sum(int(sale['sales']) for sale in sales)
     book['number_of_sales'] = total_sales
-    
     return render(request, 'books/book_detail.html', {'book': book, 'reviews': reviews, 'sales': sales})
 
 def book_create(request):
@@ -141,7 +139,6 @@ def book_edit(request, pk):
         return redirect('book_list')
     
     authors = list(collection.find({}, {"_id": 1, "name": 1}))
-    print(book)
     return render(request, 'books/book_form.html', {'book': book, 'authors': authors})
 
 def book_delete(request, pk):

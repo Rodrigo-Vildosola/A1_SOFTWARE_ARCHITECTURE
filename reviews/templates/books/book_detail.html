@@ -44,17 +44,19 @@
                     <div class="relative">
                         <div class="border-l-4 border-indigo-600 absolute h-full top-0" style="left: 20px;"></div>
                         <ul class="list-none m-0 p-0 pl-12">
-                            {% for sale in sales %}
-                                <li class="mb-8 flex items-center">
-                                    <div class="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white absolute" style="left: 2px;">
-                                        <i class="fas fa-calendar-alt"></i>
-                                    </div>
-                                    <div class="ml-4">
+                        {% for sale in sales %}
+                          <li class="mb-8 hover:bg-gray-100 transition duration-300">
+                              <a href="{% url 'sale_detail' sale|get_id %}" class=" items-start text-gray-700">
+                                  <div class="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white absolute" style="left: 2px;">
+                                      <i class="fas fa-calendar-alt"></i>
+                                  </div>
+                                  <div class="ml-14">
                                       <p class="text-gray-700 mb-2"><i class="fas fa-calendar-alt text-indigo-600 mr-2"></i><strong>Year:</strong> {{ sale.year }}</p>
                                       <p class="text-gray-700"><i class="fas fa-dollar-sign text-green-500 mr-2"></i><strong>Sales:</strong> {{ sale.sales }}</p>
-                                    </div>
-                                </li>
-                            {% endfor %}
+                                  </div>
+                              </a>
+                          </li>
+                        {% endfor %}
                         </ul>
                     </div>
                 {% else %}

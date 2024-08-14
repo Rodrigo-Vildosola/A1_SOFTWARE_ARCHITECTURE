@@ -1,5 +1,6 @@
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
+from django.urls import reverse
 from bson.objectid import ObjectId
 from reviews.queries.sales import get_all_sales, get_sale_by_id, create_sale, update_sale, delete_sale
 from reviews.utils import collection
@@ -43,30 +44,26 @@ def sale_create(request):
         create_sale(book_id, sale)
         return redirect('sales_list')
     
-    # Fetch only necessary fields (name and id) to avoid loading too much data
     books = list(collection.aggregate([
         {"$unwind": "$books"},
         {"$project": {"_id": "$books._id", "name": "$books.name"}}
     ]))
     return render(request, 'sales/sale_form.html', {'books': books})
 
+
 def sale_create_for_book(request, book_id):
+    book = collection.find_one({"books._id": ObjectId(book_id)}, {"books.$": 1})
+    book = book['books'][0] if book else None
+    
     if request.method == "POST":
-        book_id = ObjectId(book_id)
         sale = {
             "year": int(request.POST.get('year')),
             "sales": int(request.POST.get('sales'))
         }
-        create_sale(book_id, sale)
-        return redirect('sales_list')
+        create_sale(ObjectId(book_id), sale)
+        return redirect(reverse('book_detail', args=[str(book_id)]))
     
-    # Fetch only necessary fields (name and id) to avoid loading too much data
-    books = list(collection.aggregate([
-        {"$unwind": "$books"},
-        {"$project": {"_id": "$books._id", "name": "$books.name"}}
-    ]))
-    return render(request, 'sales/sale_form.html', {'books': books})
-
+    return render(request, 'sales/sale_form.html', {'book': book})
 
 def sale_edit(request, pk):
     sale = get_sale_by_id(pk)

@@ -53,7 +53,6 @@ def review_create(request):
     return render(request, 'reviews/review_form.html', {'books': books})
 
 
-
 def review_create_for_book(request, book_id):
     book = collection.find_one({"books._id": ObjectId(book_id)}, {"books.$": 1})
     book = book['books'][0] if book else None

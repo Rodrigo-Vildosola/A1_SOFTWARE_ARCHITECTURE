@@ -94,7 +94,6 @@ def author_edit(request, pk):
     author = get_author_by_id(pk)
     if not author:
         return HttpResponseNotFound("Author not found.")
-    print(author)
     if request.method == "POST":
         updated_author = {
             "name": request.POST.get('name'),
