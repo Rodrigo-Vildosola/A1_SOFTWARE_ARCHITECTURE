@@ -4,29 +4,37 @@
 {% block title %}{% if book %}Edit Book{% else %}Add Book{% endif %}{% endblock %}
 
 {% block content %}
-<div class="max-w-xl mx-auto mt-6 bg-white p-8 rounded-lg shadow-lg">
+<div class="max-w-4xl mx-auto mt-6 bg-white p-8 rounded-lg shadow-lg">
     <h1 class="text-3xl font-bold mb-6 text-indigo-600 flex items-center">
         <i class="fas fa-book mr-2"></i>
         {% if book %}Edit Book{% else %}Add Book{% endif %}
     </h1>
     <form method="post" class="space-y-6">
         {% csrf_token %}
-        <div class="flex items-center">
-            <label for="name" class="block text-gray-700 w-1/4">Name</label>
-            <input required type="text" id="name" name="name" value="{% if book %}{{ book.name }}{% endif %}" class="mt-1 p-3 block w-3/4 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+        <div class="space-y-2">
+            <label for="name" class="block text-gray-700 flex items-center">
+                <i class="fas fa-signature mr-2"></i>Name
+            </label>
+            <input required type="text" id="name" name="name" value="{% if book %}{{ book.name }}{% endif %}" class="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
         </div>
-        <div class="flex items-center">
-            <label for="summary" class="block text-gray-700 w-1/4">Summary</label>
-            <textarea id="summary" name="summary" class="mt-1 p-3 block w-3/4 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">{% if book %}{{ book.summary }}{% endif %}</textarea>
+        <div class="space-y-2">
+            <label for="summary" class="block text-gray-700 flex items-center">
+                <i class="fas fa-align-left mr-2"></i>Summary
+            </label>
+            <textarea id="summary" name="summary" class="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 auto-resize">{% if book %}{{ book.summary }}{% endif %}</textarea>
         </div>
-        <div class="flex items-center">
-            <label for="date_of_publication" class="block text-gray-700 w-1/4">Date of Publication</label>
-            <input required type="date" id="date_of_publication" name="date_of_publication" value="{% if book %}{{ book.date_of_publication|date:'Y-m-d' }}{% endif %}" class="mt-1 p-3 block w-3/4 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+        <div class="space-y-2">
+            <label for="date_of_publication" class="block text-gray-700 flex items-center">
+                <i class="fas fa-calendar-alt mr-2"></i>Date of Publication
+            </label>
+            <input required type="text" id="date_of_publication" name="date_of_publication" value="{% if book %}{{ book.date_of_publication|format_date }}{% endif %}" class="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 datepicker">
         </div>
         {% if not author %}
-        <div class="flex items-center">
-            <label for="author_id" class="block text-gray-700 w-1/4">Author</label>
-            <select required id="author_id" name="author_id" class="mt-1 p-3 block w-3/4 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+        <div class="space-y-2">
+            <label for="author_id" class="block text-gray-700 flex items-center">
+                <i class="fas fa-user mr-2"></i>Author
+            </label>
+            <select required id="author_id" name="author_id" class="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
                 {% for author in authors %}
                     <option value="{{ author|get_id }}" {% if book and book.author_id == author|get_id %}selected{% endif %}>{{ author.name }}</option>
                 {% endfor %}
@@ -35,9 +43,41 @@
         {% else %}
         <input type="hidden" name="author_id" value="{{ author|get_id }}">
         {% endif %}
-        <button type="submit" class="mt-6 w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-3 rounded-lg shadow-lg hover:from-blue-600 hover:to-indigo-700 transition duration-300 flex items-center justify-center">
-            <i class="fas fa-save mr-2"></i> Save
+        <button type="submit" class="mt-4 bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-6 py-3 rounded-lg shadow-lg hover:from-blue-600 hover:to-indigo-600 transition duration-300 flex items-center">
+          <i class="fas fa-save mr-2"></i> Save
         </button>
     </form>
 </div>
+
+<!-- Include Flatpickr CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+<!-- Include Flatpickr JS -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+    // Initialize Flatpickr on the date input
+    flatpickr(".datepicker", {
+        altInput: true,
+        altFormat: "F j, Y",
+        dateFormat: "Y-m-d",
+        defaultDate: "{% if book %}{{ book.date_of_publication|format_date }}{% endif %}"
+    });
+
+    // Auto resize textarea
+    document.addEventListener('input', function (event) {
+        if (event.target.classList.contains('auto-resize')) {
+            event.target.style.height = 'auto';
+            event.target.style.height = (event.target.scrollHeight) + 'px';
+        }
+    }, false);
+
+    // Trigger auto resize on page load
+    document.addEventListener('DOMContentLoaded', function () {
+        const textareas = document.querySelectorAll('.auto-resize');
+        textareas.forEach(textarea => {
+            textarea.style.height = 'auto';
+            textarea.style.height = (textarea.scrollHeight) + 'px';
+        });
+    });
+</script>
 {% endblock %}
