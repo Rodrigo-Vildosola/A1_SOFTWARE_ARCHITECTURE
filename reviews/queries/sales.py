@@ -1,10 +1,7 @@
-from reviews.mongo import Mongo
 from bson.objectid import ObjectId
 from pymongo.errors import PyMongoError
+from reviews.utils import collection
 
-# Initialize database and collection
-db = Mongo().database
-collection = db['object']
 
 def get_all_sales(page=1, name_filter=''):
     try:

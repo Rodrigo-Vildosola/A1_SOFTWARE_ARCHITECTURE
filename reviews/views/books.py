@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from bson.objectid import ObjectId
-from reviews.mongo import Mongo
+from reviews.utils import collection
 from reviews.queries.books import (
     get_top_rated_books,
     get_top_selling_books,
@@ -14,8 +14,6 @@ from reviews.queries.books import (
     delete_book
 )
 
-db = Mongo().database
-collection = db.object
 
 def top_books(request):
     return render(request, 'top_books.html')
@@ -36,13 +34,18 @@ def top_rated_books(request):
     return JsonResponse(response_data)
 
 def top_selling_books(request):
-    top_selling_books = get_top_selling_books()
+    page = int(request.GET.get('page', 1))
+    name_filter = request.GET.get('name_filter', '')
+    top_selling_books, total_books_count = get_top_selling_books(page, name_filter)
     for book in top_selling_books:
         book['_id'] = str(book['_id'])
         book['author_id'] = str(book['author_id'])
+        book['top_5_publication_year'] = [str(year) for year in book['top_5_publication_year']]
 
     response_data = {
         'top_selling_books': top_selling_books,
+        'current_page': page,
+        'num_pages': (total_books_count + 9) // 10  # Assuming 10 items per page
     }
     return JsonResponse(response_data)
 

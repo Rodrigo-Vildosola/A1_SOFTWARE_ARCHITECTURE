@@ -1,13 +1,11 @@
 from django.shortcuts import render, redirect
 from bson.objectid import ObjectId
 from reviews.queries.authors import get_author_with_books_reviews_sales, get_books_by_author
-from reviews.mongo import Mongo
-from django.core.paginator import Paginator
+from reviews.utils import collection
+
 from django.http import HttpResponseNotFound, JsonResponse
 
-# MongoDB connection
-db = Mongo().database
-collection = db.object
+
 
 
 def get_author_by_id(pk, include_books=False):

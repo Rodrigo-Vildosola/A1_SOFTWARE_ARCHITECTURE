@@ -1,10 +1,7 @@
 
 from bson.objectid import ObjectId
-from reviews.mongo import Mongo
+from reviews.utils import collection
 
-# MongoDB connection
-db = Mongo().database
-collection = db.object
 
 def get_books_by_author(author_id):
     author = collection.find_one({"_id": ObjectId(author_id)}, {"books": 1})

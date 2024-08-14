@@ -1,10 +1,8 @@
 from django.http import JsonResponse
 from django.shortcuts import render
 from reviews.utils import search_books
-from reviews.mongo import Mongo
 
 
-db = Mongo().database
 
 def home(request):
     return render(request, 'index.html')
