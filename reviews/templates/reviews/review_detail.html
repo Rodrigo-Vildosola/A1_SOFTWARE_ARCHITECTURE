@@ -4,33 +4,45 @@
 {% block title %}Review Detail{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto mt-8 bg-white p-8 rounded-lg shadow-lg">
-    <h1 class="text-3xl font-bold mb-6 text-indigo-600 flex items-center">
-        <i class="fas fa-star mr-2"></i>Review Detail
+<div class="max-w-4xl mx-auto mt-10 bg-white p-10 rounded-lg shadow-lg">
+    <h1 class="text-4xl font-bold mb-8 text-indigo-600 flex items-center">
+        <i class="fas fa-star mr-3"></i>Review Detail
     </h1>
-    <div class="space-y-4">
-        <p class="text-gray-700 flex items-center">
-            <i class="fas fa-book mr-2 text-indigo-600"></i>
-            <strong>Book ID:</strong> {{ review.book_id }}
-        </p>
-        <p class="text-gray-700 flex items-center">
-            <i class="fas fa-align-left mr-2 text-indigo-600"></i>
-            <strong>Review:</strong> {{ review.review }}
-        </p>
-        <p class="text-gray-700 flex items-center">
-            <i class="fas fa-star mr-2 text-indigo-600"></i>
-            <strong>Score:</strong> {{ review.score }}
-        </p>
-        <p class="text-gray-700 flex items-center">
-            <i class="fas fa-thumbs-up mr-2 text-indigo-600"></i>
-            <strong>Number of Upvotes:</strong> {{ review.number_of_upvotes }}
-        </p>
+    <div class="space-y-6">
+        <div class="flex items-center space-x-2">
+            <i class="fas fa-book text-indigo-600 text-2xl"></i>
+            <strong>Book:</strong>
+            <p class="text-gray-700 text-md"> 
+                <a href="{% url 'book_detail' review.book_id %}" class="text-indigo-600 hover:underline">{{ review.book_name }}</a>
+            </p>
+        </div>
+        <div class="flex items-center space-x-2">
+            <i class="fas fa-align-left text-indigo-600 text-2xl"></i>
+            <strong>Review:</strong>
+            <p class="text-gray-700 text-md">
+                 {{ review.review }}
+            </p>
+        </div>
+        <div class="flex items-center space-x-2">
+            <i class="fas fa-star text-indigo-600 text-2xl"></i>
+            <strong>Score:</strong>
+            <p class="text-gray-700 text-md">
+               {{ review.score }}
+            </p>
+        </div>
+        <div class="flex items-center space-x-2">
+            <i class="fas fa-thumbs-up text-indigo-600 text-2xl"></i>
+            <strong>Number of Upvotes:</strong>
+            <p class="text-gray-700 text-md">
+               {{ review.number_of_upvotes }}
+            </p>
+        </div>
     </div>
-    <div class="mt-6 flex space-x-4">
-        <a href="{% url 'review_edit' review|get_id %}" class="bg-gradient-to-r from-yellow-400 to-yellow-500 text-white px-6 py-3 rounded-lg shadow-lg hover:from-yellow-500 hover:to-yellow-600 transition duration-300 flex items-center">
+    <div class="mt-10 flex space-x-6">
+        <a href="{% url 'review_edit' review|get_id %}" class="bg-gradient-to-r from-yellow-400 to-yellow-500 text-white px-8 py-3 rounded-lg shadow-lg hover:from-yellow-500 hover:to-yellow-600 transition duration-300 flex items-center">
             <i class="fas fa-edit mr-2"></i> Edit
         </a>
-        <a href="{% url 'review_delete' review|get_id %}" class="bg-gradient-to-r from-red-400 to-red-500 text-white px-6 py-3 rounded-lg shadow-lg hover:from-red-500 hover:to-red-600 transition duration-300 flex items-center">
+        <a href="{% url 'review_delete' review|get_id %}" class="bg-gradient-to-r from-red-400 to-red-500 text-white px-8 py-3 rounded-lg shadow-lg hover:from-red-500 hover:to-red-600 transition duration-300 flex items-center">
             <i class="fas fa-trash-alt mr-2"></i> Delete
         </a>
     </div>

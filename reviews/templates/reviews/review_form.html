@@ -16,11 +16,13 @@
             <label for="book_id" class="block text-gray-700 flex items-center">
                 <i class="fas fa-book mr-2"></i>Book
             </label>
-            <select id="book_id" name="book_id" class="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+            <input list="book_list" id="book_id_input" name="book_id_input" class="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="Type to search...">
+            <datalist id="book_list">
                 {% for book in books %}
-                    <option value="{{ book|get_id }}" {% if review and review.book_id == book|get_id %}selected{% endif %}>{{ book.name }}</option>
+                    <option value="{{ book.name }}" data-id="{{ book|get_id }}"></option>
                 {% endfor %}
-            </select>
+            </datalist>
+            <input type="hidden" id="book_id" name="book_id" value="{% if review %}{{ review.book_id }}{% endif %}">
         </div>
         {% else %}
         <input type="hidden" name="book_id" value="{{ book|get_id }}">
@@ -92,6 +94,22 @@
             this.classList.add('bg-indigo-500', 'text-white');
             this.classList.remove('bg-white', 'text-gray-700');
         });
+    });
+
+    // Handle book selection from datalist
+    document.getElementById('book_id_input').addEventListener('input', function(e) {
+        const input = e.target;
+        const list = document.getElementById('book_list');
+        const options = list.options;
+        const hiddenInput = document.getElementById('book_id');
+
+        hiddenInput.value = '';  // Clear previous value
+        for (let i = 0; i < options.length; i++) {
+            if (options[i].value === input.value) {
+                hiddenInput.value = options[i].dataset.id;
+                break;
+            }
+        }
     });
 </script>
 {% endblock %}

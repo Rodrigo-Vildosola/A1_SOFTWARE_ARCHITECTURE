@@ -12,18 +12,21 @@ def get_all_sales(page=1, name_filter=''):
             {"$unwind": "$books"},
             {"$unwind": "$books.sales"},
             {
-                "$match": {
-                    "books.name": {"$regex": name_filter, "$options": "i"}
-                }
-            },
-            {
                 "$project": {
                     "_id": "$books.sales._id",
                     "author_name": "$name",
                     "book_id": "$books._id",
                     "book_name": "$books.name",
-                    "year": "$books.sales.year",
+                    "year": {"$toString": "$books.sales.year"},
                     "sales": "$books.sales.sales"
+                }
+            },
+            {
+                "$match": {
+                    "$or": [
+                        {"book_name": {"$regex": name_filter, "$options": "i"}},
+                        {"year": {"$regex": name_filter, "$options": "i"}}
+                    ]
                 }
             },
             {"$sort": {"book_name": 1}},  # Sort by book name
@@ -35,8 +38,16 @@ def get_all_sales(page=1, name_filter=''):
             {"$unwind": "$books"},
             {"$unwind": "$books.sales"},
             {
+                "$project": {
+                    "year": {"$toString": "$books.sales.year"}
+                }
+            },
+            {
                 "$match": {
-                    "books.name": {"$regex": name_filter, "$options": "i"}
+                    "$or": [
+                        {"books.name": {"$regex": name_filter, "$options": "i"}},
+                        {"year": {"$regex": name_filter, "$options": "i"}}
+                    ]
                 }
             },
             {"$count": "total"}

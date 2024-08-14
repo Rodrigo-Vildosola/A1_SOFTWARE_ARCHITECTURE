@@ -13,7 +13,10 @@ def get_all_reviews(page=1, name_filter=''):
             {"$unwind": "$books.reviews"},
             {
                 "$match": {
-                    "books.name": {"$regex": name_filter, "$options": "i"}
+                    "$or": [
+                        {"books.name": {"$regex": name_filter, "$options": "i"}},
+                        {"books.reviews.review": {"$regex": name_filter, "$options": "i"}}
+                    ]
                 }
             },
             {
@@ -37,7 +40,10 @@ def get_all_reviews(page=1, name_filter=''):
             {"$unwind": "$books.reviews"},
             {
                 "$match": {
-                    "books.name": {"$regex": name_filter, "$options": "i"}
+                    "$or": [
+                        {"books.name": {"$regex": name_filter, "$options": "i"}},
+                        {"books.reviews.review": {"$regex": name_filter, "$options": "i"}}
+                    ]
                 }
             },
             {"$count": "total"}
@@ -50,7 +56,7 @@ def get_all_reviews(page=1, name_filter=''):
     except PyMongoError as e:
         print(f"An error occurred: {e}")
         return [], 0
-    
+  
 
 def get_review_by_id(review_id):
     try:
