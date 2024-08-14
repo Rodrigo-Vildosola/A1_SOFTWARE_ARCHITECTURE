@@ -2,6 +2,7 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from reviews.utils import collection
 from bson.objectid import ObjectId
+from django.urls import reverse
 from reviews.queries.reviews import get_all_reviews, get_review_by_id, create_review, update_review, delete_review
 
 
@@ -45,30 +46,28 @@ def review_create(request):
         create_review(book_id, review)
         return redirect('review_list')
     
-    # Fetch only necessary fields (name and id) to avoid loading too much data
     books = list(collection.aggregate([
         {"$unwind": "$books"},
         {"$project": {"_id": "$books._id", "name": "$books.name"}}
     ]))
     return render(request, 'reviews/review_form.html', {'books': books})
 
+
+
 def review_create_for_book(request, book_id):
+    book = collection.find_one({"books._id": ObjectId(book_id)}, {"books.$": 1})
+    book = book['books'][0] if book else None
+    
     if request.method == "POST":
-        book_id = ObjectId(book_id)
         review = {
             "review": request.POST.get('review'),
             "score": int(request.POST.get('score')),
             "number_of_upvotes": int(request.POST.get('number_of_upvotes'))
         }
-        create_review(book_id, review)
-        return redirect('review_list')
+        create_review(ObjectId(book_id), review)
+        return redirect(reverse('book_detail', args=[str(book_id)]))
     
-    # Fetch only necessary fields (name and id) to avoid loading too much data
-    books = list(collection.aggregate([
-        {"$unwind": "$books"},
-        {"$project": {"_id": "$books._id", "name": "$books.name"}}
-    ]))
-    return render(request, 'reviews/review_form.html', {'books': books})
+    return render(request, 'reviews/review_form.html', {'book': book})
 
 
 def review_edit(request, pk):
@@ -82,12 +81,12 @@ def review_edit(request, pk):
         update_review(pk, updated_review)
         return redirect('review_list')
     
-    # Fetch only necessary fields (name and id) to avoid loading too much data
     books = list(collection.aggregate([
         {"$unwind": "$books"},
         {"$project": {"_id": "$books._id", "name": "$books.name"}}
     ]))
     return render(request, 'reviews/review_form.html', {'review': review, 'books': books})
+
 
 def review_delete(request, pk):
     review = get_review_by_id(pk)

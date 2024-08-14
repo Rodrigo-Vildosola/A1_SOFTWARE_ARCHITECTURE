@@ -4,35 +4,94 @@
 {% block title %}{% if review %}Edit Review{% else %}Add Review{% endif %}{% endblock %}
 
 {% block content %}
-<div class="max-w-xl mx-auto mt-6 bg-white p-6 rounded-lg shadow-lg">
-    <h1 class="text-2xl font-bold mb-4">{% if review %}Edit Review{% else %}Add Review{% endif %}</h1>
-    <form method="post">
+<div class="max-w-4xl mx-auto mt-6 bg-white p-8 rounded-lg shadow-lg">
+    <h1 class="text-3xl font-bold mb-6 text-indigo-600 flex items-center">
+        <i class="fas fa-star mr-2"></i>
+        {% if review %}Edit Review{% else %}Add Review{% endif %}
+    </h1>
+    <form method="post" class="space-y-6">
         {% csrf_token %}
-        <div class="mb-4">
-            <label for="book_id" class="block text-gray-700">Book</label>
-            <select id="book_id" name="book_id" class="mt-1 block w-full border border-gray-300 p-2 rounded">
+        {% if not book %}
+        <div class="space-y-2">
+            <label for="book_id" class="block text-gray-700 flex items-center">
+                <i class="fas fa-book mr-2"></i>Book
+            </label>
+            <select id="book_id" name="book_id" class="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
                 {% for book in books %}
                     <option value="{{ book|get_id }}" {% if review and review.book_id == book|get_id %}selected{% endif %}>{{ book.name }}</option>
                 {% endfor %}
             </select>
         </div>
-        <div class="mb-4">
-            <label for="review" class="block text-gray-700">Review</label>
-            <textarea id="review" name="review" class="mt-1 block w-full border border-gray-300 p-2 rounded">{% if review %}{{ review.review }}{% endif %}</textarea>
+        {% else %}
+        <input type="hidden" name="book_id" value="{{ book|get_id }}">
+        <div class="space-y-2">
+            <label for="book_name" class="block text-gray-700 flex items-center">
+                <i class="fas fa-book mr-2"></i>Book
+            </label>
+            <input type="text" id="book_name" name="book_name" value="{{ book.name }}" class="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" disabled>
         </div>
-        <div class="mb-4">
-            <label for="score" class="block text-gray-700">Score</label>
-            <select id="score" name="score" class="mt-1 block w-full border border-gray-300 p-2 rounded">
+        {% endif %}
+        <div class="space-y-2">
+            <label for="review" class="block text-gray-700 flex items-center">
+                <i class="fas fa-align-left mr-2"></i>Review
+            </label>
+            <textarea id="review" name="review" class="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 auto-resize">{% if review %}{{ review.review }}{% endif %}</textarea>
+        </div>
+        <div class="space-y-2">
+            <label for="score" class="block text-gray-700 flex items-center">
+                <i class="fas fa-star mr-2"></i>Score
+            </label>
+            <div id="score-buttons" class="flex space-x-2">
                 {% for i in 1|to:5 %}
-                    <option value="{{ i }}" {% if review and review.score == i %}selected{% endif %}>{{ i }}</option>
+                    <button type="button" data-value="{{ i }}" class="score-button p-3 w-12 h-12 flex items-center justify-center border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 {% if review and review.score == i %}bg-indigo-500 text-white{% else %}bg-white text-gray-700{% endif %}">
+                        {{ i }}
+                    </button>
                 {% endfor %}
-            </select>
+            </div>
+            <input type="hidden" id="score" name="score" value="{% if review %}{{ review.score }}{% endif %}">
         </div>
-        <div class="mb-4">
-            <label for="number_of_upvotes" class="block text-gray-700">Number of Upvotes</label>
-            <input type="number" id="number_of_upvotes" name="number_of_upvotes" value="{% if review %}{{ review.number_of_upvotes }}{% endif %}" class="mt-1 block w-full border border-gray-300 p-2 rounded">
+        <div class="space-y-2">
+            <label for="number_of_upvotes" class="block text-gray-700 flex items-center">
+                <i class="fas fa-thumbs-up mr-2"></i>Number of Upvotes
+            </label>
+            <input type="number" id="number_of_upvotes" name="number_of_upvotes" value="{% if review %}{{ review.number_of_upvotes }}{% endif %}" class="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
         </div>
-        <button type="submit" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-300">Save</button>
+        <button type="submit" class="mt-4 bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-6 py-3 rounded-lg shadow-lg hover:from-blue-600 hover:to-indigo-600 transition duration-300 flex items-center">
+            <i class="fas fa-save mr-2"></i> Save
+        </button>
     </form>
 </div>
+
+<!-- Include any necessary JS for form enhancements -->
+<script>
+    // Auto resize textarea
+    document.addEventListener('input', function (event) {
+        if (event.target.classList.contains('auto-resize')) {
+            event.target.style.height = 'auto';
+            event.target.style.height = (event.target.scrollHeight) + 'px';
+        }
+    }, false);
+
+    // Trigger auto resize on page load
+    document.addEventListener('DOMContentLoaded', function () {
+        const textareas = document.querySelectorAll('.auto-resize');
+        textareas.forEach(textarea => {
+            textarea.style.height = 'auto';
+            textarea.style.height = (textarea.scrollHeight) + 'px';
+        });
+    });
+
+    // Handle score button selection
+    document.querySelectorAll('.score-button').forEach(button => {
+        button.addEventListener('click', function() {
+            document.getElementById('score').value = this.dataset.value;
+            document.querySelectorAll('.score-button').forEach(btn => {
+                btn.classList.remove('bg-indigo-500', 'text-white');
+                btn.classList.add('bg-white', 'text-gray-700');
+            });
+            this.classList.add('bg-indigo-500', 'text-white');
+            this.classList.remove('bg-white', 'text-gray-700');
+        });
+    });
+</script>
 {% endblock %}

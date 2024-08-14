@@ -20,13 +20,13 @@
     <div class="overflow-x-auto shadow-lg rounded-lg">
         <table id="reviewTable" class="min-w-full bg-white">
             <thead>
-                <tr class="bg-gradient-to-r from-indigo-500 to-purple-500 text-white uppercase text-sm leading-normal">
-                    <th class="py-3 px-6 text-left">Book</th>
-                    <th class="py-3 px-6 text-left">Review</th>
-                    <th class="py-3 px-6 text-left">Score</th>
-                    <th class="py-3 px-6 text-left">Upvotes</th>
-                    <th class="py-3 px-6 text-left">Actions</th>
-                </tr>
+              <tr class="bg-gradient-to-r from-indigo-500 to-purple-500 text-white uppercase text-sm leading-normal">
+                <th class="py-3 px-6 text-left"><i class="fas fa-book mr-2"></i>Book</th>
+                <th class="py-3 px-6 text-left"><i class="fas fa-comment-alt mr-2"></i>Review</th>
+                <th class="py-3 px-6 text-left"><i class="fas fa-star mr-2"></i>Score</th>
+                <th class="py-3 px-6 text-left"><i class="fas fa-thumbs-up mr-2"></i>Upvotes</th>
+                <th class="py-3 px-6 text-left"><i class="fas fa-tools mr-2"></i>Actions</th>
+              </tr>
             </thead>
             <tbody id="reviewTbody" class="text-gray-700">
                 <!-- Dynamic content will be loaded here -->
@@ -61,12 +61,15 @@ async function loadReviews(page = currentPage) {
         tr.className = 'border-b border-gray-200 hover:bg-gray-100 transition duration-200';
         tr.innerHTML = `
             <td class="py-3 px-6 text-left">
-                <a href="/review/${review._id}" class="text-blue-500 hover:underline">${review.book_name}</a>
+                <a href="/book/${review.book_id}" class="text-indigo-600 hover:underline">${review.book_name}</a>
             </td>
-            <td class="py-3 px-6 text-left">${review.review}</td>
+            <td class="py-3 px-6 text-left">
+                <a href="/review/${review._id}" class="text-blue-500 hover:underline">${review.review}</a>
+            </td>
             <td class="py-3 px-6 text-left">${review.score}</td>
             <td class="py-3 px-6 text-left">${review.number_of_upvotes}</td>
             <td class="py-3 px-6 text-left flex space-x-2">
+                <a href="/review/${review._id}" class="text-blue-500 hover:text-blue-600 transition duration-300 p-2 border border-blue-500 rounded-lg hover:bg-blue-100"><i class="fas fa-eye"></i></a>
                 <a href="/review/${review._id}/edit" class="text-yellow-500 hover:text-yellow-600 transition duration-300 p-2 border border-yellow-500 rounded-lg hover:bg-yellow-100"><i class="fas fa-edit"></i></a>
                 <a href="/review/${review._id}/delete" class="text-red-500 hover:text-red-600 transition duration-300 p-2 border border-red-500 rounded-lg hover:bg-red-100"><i class="fas fa-trash-alt"></i></a>
             </td>
