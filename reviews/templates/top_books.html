@@ -18,9 +18,9 @@
                   <i class="fas fa-dollar-sign mr-2"></i>Top 50 Selling Books
               </button>
           </div>
-          <div class="flex justify-center" id="topSellingPagination">
+          <div class="flex justify-center" id="pagination" style="display: none;">
             <!-- Pagination buttons will be loaded here -->
-        </div>
+          </div>
       </div>
 
       <div id="top-rated" class="tab-content">
@@ -81,8 +81,10 @@
 
         if (tabName === 'top-rated') {
             fetchTopRatedBooks();
+            document.getElementById('pagination').style.display = 'none';
         } else if (tabName === 'top-selling') {
             fetchTopSellingBooks();
+            document.getElementById('pagination').style.display = 'flex';
         }
     }
 
@@ -96,17 +98,29 @@
             tr.className = 'border-b border-gray-200 hover:bg-gray-100 transition duration-200';
             tr.innerHTML = `
                 <td class="py-3 px-6 text-left">
-                    <a href="/book/${book._id}" class="text-indigo-600 hover:underline">${book.book_name}</a>
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-book text-indigo-600"></i>
+                        <a href="/book/${book._id}" class="text-indigo-600 hover:underline">
+                          <span class="font-semibold text-indigo-600">${book.book_name}</span>
+                        </a>
+                    </div>
                 </td>
                 <td class="py-3 px-6 text-left">
-                    <a href="/author/${book.author_id}" class="text-indigo-600 hover:underline">${book.author_name}</a>
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-user text-indigo-600"></i>
+                        <span class="text-gray-800">${book.author_name}</span>
+                    </div>
                 </td>
-                <td class="py-3 px-6 text-left">${book.average_score}</td>
+                <td class="py-3 px-6 text-left">${book.average_score.toFixed(2)}</td>
                 <td class="py-3 px-6 text-left">
-                    <a href="/review/${book.highest_rated_review._id}" class="text-indigo-600 hover:underline">${book.highest_rated_review.review}</a>
+                    <div class="text-gray-800">
+                        <p class="mb-2"><strong>Highest Rated:</strong> ${book.highest_rated_review.review}</p>
+                    </div>
                 </td>
                 <td class="py-3 px-6 text-left">
-                    <a href="/review/${book.lowest_rated_review._id}" class="text-indigo-600 hover:underline">${book.lowest_rated_review.review}</a>
+                    <div class="text-gray-800">
+                        <p><strong>Lowest Rated:</strong> ${book.lowest_rated_review.review}</p>
+                    </div>
                 </td>
             `;
             tbody.appendChild(tr);
@@ -127,10 +141,16 @@
             tr.className = 'border-b border-gray-200 hover:bg-gray-100 transition duration-200';
             tr.innerHTML = `
                 <td class="py-3 px-6 text-left">
-                    <a href="/book/${book._id}" class="text-indigo-600 hover:underline">${book.book_name}</a>
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-book text-indigo-600"></i>
+                        <span class="font-semibold text-indigo-600">${book.book_name}</span>
+                    </div>
                 </td>
                 <td class="py-3 px-6 text-left">
-                    <a href="/author/${book.author_id}" class="text-indigo-600 hover:underline">${book.author_name}</a>
+                    <div class="flex items-center space-x-2">
+                        <i class="fas fa-user text-indigo-600"></i>
+                        <span class="text-gray-800">${book.author_name}</span>
+                    </div>
                 </td>
                 <td class="py-3 px-6 text-left">${book.total_sales}</td>
                 <td class="py-3 px-6 text-left">${book.author_total_sales}</td>
@@ -139,7 +159,7 @@
             tbody.appendChild(tr);
         });
 
-        const pagination = document.getElementById('topSellingPagination');
+        const pagination = document.getElementById('pagination');
         pagination.innerHTML = '';
         for (let i = 1; i <= data.num_pages; i++) {
             const button = document.createElement('button');
