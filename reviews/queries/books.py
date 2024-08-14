@@ -92,12 +92,29 @@ def get_top_selling_books(page=1, name_filter=''):
                 }
             },
             {
+                "$group": {
+                    "_id": "$author_id",
+                    "author_name": {"$first": "$author_name"},
+                    "books": {
+                        "$push": {
+                            "book_id": "$_id",
+                            "book_name": "$book_name",
+                            "total_sales": "$total_sales",
+                            "top_5_publication_year": "$top_5_publication_year"
+                        }
+                    },
+                    "author_total_sales": {"$sum": "$total_sales"}
+                }
+            },
+            {"$unwind": "$books"},
+            {
                 "$project": {
-                    "book_name": 1,
+                    "book_name": "$books.book_name",
                     "author_name": 1,
-                    "author_id": 1,
-                    "total_sales": 1,
-                    "top_5_publication_year": {"$slice": ["$top_5_publication_year", 5]}
+                    "author_id": "$_id",
+                    "total_sales": "$books.total_sales",
+                    "author_total_sales": 1,
+                    "top_5_publication_year": {"$slice": ["$books.top_5_publication_year", 5]}
                 }
             },
             {"$sort": {"total_sales": -1}},
