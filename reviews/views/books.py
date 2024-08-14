@@ -141,6 +141,7 @@ def book_edit(request, pk):
         return redirect('book_list')
     
     authors = list(collection.find({}, {"_id": 1, "name": 1}))
+    print(book)
     return render(request, 'books/book_form.html', {'book': book, 'authors': authors})
 
 def book_delete(request, pk):

@@ -34,13 +34,13 @@
             <label for="author_id" class="block text-gray-700 flex items-center">
                 <i class="fas fa-user mr-2"></i>Author
             </label>
-            <input list="author_list" id="author_id" name="author_id" class="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="Type to search...">
+            <input list="author_list" id="author_id" name="author_id" class="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" placeholder="Type to search..." value="{{ book.author_name }}">
             <datalist id="author_list">
                 {% for author in authors %}
                     <option value="{{ author.name }}" data-id="{{ author|get_id }}"></option>
                 {% endfor %}
             </datalist>
-            <input type="hidden" id="author_id_hidden" name="author_id_hidden">
+            <input type="hidden" id="author_id_hidden" name="author_id_hidden" value="{% if book %}{{ book.author_id }}{% endif %}">
         </div>
         {% else %}
         <input type="hidden" name="author_id" value="{{ author|get_id }}">
