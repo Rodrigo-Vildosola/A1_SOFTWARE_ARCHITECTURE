@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:4.4
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - bookreview_network
+
+  book-review-app:
+    build:
+      context: .
+    container_name: book-review-app
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code
+      - static_volume:/code/staticfiles
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mongodb
+    networks:
+      - bookreview_network
+    env_file:
+      - .env
+
+networks:
+  bookreview_network:
+
+volumes:
+  mongo_data:
+  static_volume:

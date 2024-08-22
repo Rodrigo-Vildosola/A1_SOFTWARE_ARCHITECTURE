@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:4.4
+    deploy:
+      replicas: 1
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - bookreview_network
+
+  book-review-app:
+    image: a1_software_architecture-book-review-app
+    deploy:
+      replicas: 2
+    container_name: book-review-app-stack
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - static_volume:/code/staticfiles
+    ports:
+      - "8080:8000"  # Cambiado a puerto 8080 en el host
+    depends_on:
+      - mongodb
+    networks:
+      - bookreview_network
+    env_file:
+      - .env
+
+networks:
+  bookreview_network:
+    driver: overlay
+
+volumes:
+  mongo_data:
+  static_volume:
