@@ -21,28 +21,25 @@ services:
     volumes:
       - .:/code
       - static_volume:/code/staticfiles
-      - media_volume:/code/media  # Mount media folder
-    ports:
-      - "8000:8000"
-    depends_on:
-      - mongodb
+      - media_volume:/code/media  # Media files
     networks:
       - bookreview_network
     env_file:
       - .env
 
-  # Varnish reverse proxy
+  # Varnish cache container
   varnish:
-    image: varnish:6.6
+    image: varnish:stable
     container_name: varnish
     ports:
-      - "8080:8080"
+      - "8080:8080"  # Exposing Varnish on port 8080
     depends_on:
       - book-review-app
+    volumes:
+      - ./varnish/default.vcl:/etc/varnish/default.vcl  # Varnish config
     networks:
       - bookreview_network
-    volumes:
-      - ./varnish/default.vcl:/etc/varnish/default.vcl
+    command: varnishd -F -a :8080 -f /etc/varnish/default.vcl -s malloc,256m
 
 networks:
   bookreview_network:

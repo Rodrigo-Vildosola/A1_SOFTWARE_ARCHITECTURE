@@ -21,6 +21,7 @@ services:
     volumes:
       - .:/code
       - static_volume:/code/staticfiles
+      - media_volume:/code/media
     ports:
       - "8000:8000"
     depends_on:
