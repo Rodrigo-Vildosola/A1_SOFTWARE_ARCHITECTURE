@@ -26,9 +26,9 @@ def get_all_sales(page=1, name_filter=''):
                     ]
                 }
             },
-            {"$sort": {"book_name": 1}},  # Sort by book name
-            {"$skip": (page - 1) * 20},   # Skip the documents for pagination
-            {"$limit": 20}                # Limit the results to 20 per page
+            {"$sort": {"book_name": 1}},  
+            {"$skip": (page - 1) * 20},  
+            {"$limit": 20}               
         ]
 
         total_sales_pipeline = [

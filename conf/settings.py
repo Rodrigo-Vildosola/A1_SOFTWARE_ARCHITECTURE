@@ -71,17 +71,6 @@ WSGI_APPLICATION = 'conf.wsgi.application'
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'djongo',
-        'NAME': 'bookreview_db',
-        'ENFORCE_SCHEMA': False,
-        'CLIENT': {
-            'host': 'mongodb',  # Nombre del servicio del contenedor
-            'port': 27017,
-        }
-    }
-}
 
 LANGUAGE_CODE = 'en-us'
 

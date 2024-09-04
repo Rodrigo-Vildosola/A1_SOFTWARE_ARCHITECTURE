@@ -51,7 +51,6 @@ def author_data(request):
 
     authors, num_pages = get_author_with_books_reviews_sales(page, sort_by, order, name_filter)
 
-    # Convert ObjectId to string
     for author in authors:
         author['_id'] = str(author['_id'])
 

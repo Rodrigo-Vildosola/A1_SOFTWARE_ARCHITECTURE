@@ -10,7 +10,6 @@ def get_books_by_author(author_id):
 
 
 def get_author_with_books_reviews_sales(page, sort_by, order, name_filter):
-    # Map the sort_by parameter to the actual field names in the documents
     sort_fields = {
         'name': 'name',
         'number_of_books': 'number_of_books',
@@ -18,7 +17,7 @@ def get_author_with_books_reviews_sales(page, sort_by, order, name_filter):
         'total_sales': 'total_sales'
     }
     
-    sort_field = sort_fields.get(sort_by, 'name')  # Default to 'name' if sort_by is invalid
+    sort_field = sort_fields.get(sort_by, 'name')
 
     pipeline = [
         {
@@ -97,6 +96,6 @@ def get_author_with_books_reviews_sales(page, sort_by, order, name_filter):
 
     total_count_result = list(collection.aggregate(total_pipeline))
     total_count = total_count_result[0]['total'] if total_count_result else 0
-    num_pages = (total_count + 9) // 10  # Calculate number of pages
+    num_pages = (total_count + 9) // 10
 
     return list(collection.aggregate(pipeline)), num_pages

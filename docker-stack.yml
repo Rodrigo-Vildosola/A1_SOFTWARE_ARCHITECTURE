@@ -22,7 +22,7 @@ services:
     volumes:
       - static_volume:/code/staticfiles
     ports:
-      - "8080:8000"  # Cambiado a puerto 8080 en el host
+      - "8080:8000"
     depends_on:
       - mongodb
     networks:

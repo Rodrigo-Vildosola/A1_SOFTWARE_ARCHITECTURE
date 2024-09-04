@@ -1,13 +1,25 @@
 from bson.objectid import ObjectId
 from .mongo import Mongo
+import os
+from django.conf import settings
+
 
 # MongoDB connection
 db = Mongo().database
 collection = db['object']
 
+
+def handle_uploaded_file(f):
+    upload_path = os.path.join(settings.MEDIA_ROOT, f.name)
+    with open(upload_path, 'wb+') as destination:
+        for chunk in f.chunks():
+            destination.write(chunk)
+    return os.path.join(settings.MEDIA_URL, f.name)  # Return the media URL to store in MongoDB
+
+
 def search_books(query, page=1, limit=10):
     skip = (page - 1) * limit
-    regex_query = {"$regex": query, "$options": "i"}  # Case-insensitive regex
+    regex_query = {"$regex": query, "$options": "i"}
 
     pipeline = [
         {

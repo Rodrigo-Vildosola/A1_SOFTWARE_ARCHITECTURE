@@ -118,13 +118,13 @@ def get_top_selling_books(page=1, name_filter=''):
                 }
             },
             {"$sort": {"total_sales": -1}},
-            {"$limit": 50}  # Limit the total number of books to top 50
+            {"$limit": 50}  
         ]
 
         books = list(collection.aggregate(pipeline))
 
-        total_books_count = len(books)  # The total number of top 50 books
-        paginated_books = books[(page - 1) * 10: page * 10]  # Paginate the results
+        total_books_count = len(books)  
+        paginated_books = books[(page - 1) * 10: page * 10]  
 
         return paginated_books, total_books_count
     except PyMongoError as e:

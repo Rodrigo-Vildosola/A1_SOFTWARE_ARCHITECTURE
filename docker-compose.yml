@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+  # MongoDB container for book review app data
   mongodb:
     image: mongo:4.4
     container_name: mongodb
@@ -11,6 +12,7 @@ services:
     networks:
       - bookreview_network
 
+  # Django app container
   book-review-app:
     build:
       context: .
