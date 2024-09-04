@@ -1,78 +1,114 @@
-# A1 Software Architecture
+# Guía de Configuración y Despliegue de la Aplicación Django con Docker y Docker Swarm
 
-
-
-## Prerequisites
-
-- Python 3.8+
-- MongoDB
-
-## Setup
-
-### 1. Clone the Repository
+## Primero se debe crear un archivo .env con el siguiente contenido:
 
 ```bash
-git clone https://github.com/Rodrigo-Vildosola/A1_SOFTWARE_ARCHITECTURE.git
-cd A1_SOFTWARE_ARCHITECTURE
+SECRET_KEY=django-insecure-j9yu*wpfnh%iluyvv2pahkp-@4%(2f!)upm4z-#b$0#p2p2i$k
+DEBUG=True
+DB_NAME=bookreview_db
+DB_USER=sagarcia4
+DB_PASSWORD=reFcukLxjt93uArD
+MONGODB_URI=mongodb://mongodb:27017/
 ```
 
-### 2. Create and Activate a Virtual Environment
-
-#### On Windows
+## 1. Clonar el Repositorio
 
 ```bash
-python -m venv venv
-venv\Scripts\activate
+git clone <URL-del-repositorio>
+cd <nombre-del-repositorio>
 ```
+## 2. Construir y Levantar los Contenedores
 
-#### On macOS and Linux
+### Construir las Imágenes
 
 ```bash
-python3 -m venv venv
-source venv/bin/activate
+docker-compose build
 ```
-
-### 3. Install Requirements
+### Levantar los Contenedores
 
 ```bash
-pip install -r requirements.txt
+docker-compose up -d
 ```
+## 3. Correr el Script `seeder.py`
 
-### 4. Set Up Environment Variables
-
-Create a `.env` file in the root directory of the project and add your MongoDB URI and database name:
-
-```
-MONGODB_URI=mongodb://localhost:27017
-DB_NAME=your_db_name
-```
-
-
-### 5. Seed the Database
-
-The seeder script can populate the database with fake data. By default, it will only seed the database if it is empty. Use the `--reset` flag to clear the database before seeding or the `--force` flag to seed regardless of the database state.
+### Accede al contenedor de la aplicación Django para ejecutar el script de inicialización:
 
 ```bash
-python seeder.py
+docker-compose exec book-review-app python /code/seeder.py
 ```
+## 4. Inicializar Docker Swarm
 
-To reset the database before seeding:
+### Inicializa Docker Swarm en el nodo:
 
 ```bash
-python seeder.py --reset
+docker swarm init
 ```
+## 5. Desplegar la Stack en Docker Swarm
 
-To force seed without resetting:
+### Despliega la stack usando el archivo `docker-stack.yml`:
 
 ```bash
-python seeder.py --force
+docker stack deploy -c docker-stack.yml bookreview_stack
 ```
-
-### 6. Run the Development Server
+### Verifica el estado:
 
 ```bash
-python manage.py runserver
+docker stack services bookreview_stack
 ```
 
-Open your web browser and navigate to `http://127.0.0.1:8000/` to view the application.
+## 6. Escalar el Servicio
 
+### Escala el servicio book-review-app a 4 réplicas:
+
+```bash
+docker service scale bookreview_stack_book-review-app=4
+```
+### Verifica el estado:
+
+```bash
+docker stack services bookreview_stack
+```
+
+## 7. Verifica el estado
+
+### Verificar los Contenedores:
+
+```bash
+docker ps
+```
+## 8. Parar Todos los Servicios y Eliminar la Stack
+
+### Detén y elimina todos los servicios de la stack:
+
+```bash
+docker stack rm bookreview_stack
+```
+## 9. (Opcional) Detener Todos los Contenedores
+
+### Detén todos los contenedores en ejecución:
+
+```bash
+docker stop $(docker ps -q)
+```
+## 10. (Opcional) Eliminar Todos los Contenedores
+
+### Elimina todos los contenedores (activos e inactivos):
+
+```bash
+docker rm $(docker ps -a -q)
+```
+## 11. (Opcional) Desactivar Docker Swarm
+
+### Desactiva Docker Swarm en el nodo:
+
+```bash
+docker swarm leave --force
+```
+## 12. (Opcional) Eliminar Redes y Volúmenes
+
+### Eliminar Redes y volumenes
+
+```bash
+docker network prune
+docker volume prune
+```

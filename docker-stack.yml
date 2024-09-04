@@ -5,7 +5,6 @@ services:
     image: mongo:4.4
     deploy:
       replicas: 1
-    container_name: mongodb
     ports:
       - "27017:27017"
     volumes:
@@ -17,7 +16,6 @@ services:
     image: a1_software_architecture-book-review-app
     deploy:
       replicas: 2
-    container_name: book-review-app-stack
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - static_volume:/code/staticfiles
