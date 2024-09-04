@@ -17,7 +17,7 @@
         </div>
         <input class="p-2 rounded-md shadow-sm border border-gray-400" type="text" id="nameFilter" onkeyup="filterTable()" placeholder="Search for books..">
     </div>
-    <div id="bookContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div id="bookContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <!-- Dynamic content will be loaded here -->
     </div>
 </div>
@@ -45,23 +45,34 @@ async function loadBooks(page = currentPage) {
         const card = document.createElement('div');
         card.className = 'bg-white shadow-lg rounded-lg p-6 flex flex-col justify-between hover:shadow-xl transition-shadow duration-300';
         card.innerHTML = `
-            <div>
-                <h2 class="text-lg font-semibold text-indigo-600 hover:underline mb-2">
-                    <a href="/book/${book._id}">${book.name}</a>
-                </h2>
-                <p class="text-sm text-gray-600 summary mb-4">${book.summary}</p>
-                <p class="text-sm text-gray-500 mb-2"><i class="far fa-calendar-alt"></i> <strong>Published:</strong> ${book.date_of_publication}</p>
-                <p class="text-sm text-gray-500"><i class="fas fa-chart-line"></i> <strong>Sales:</strong> ${book.number_of_sales}</p>
-            </div>
-            <div class="mt-4 flex justify-end space-x-4">
-                <a href="/book/${book._id}/edit" class="text-yellow-500 hover:text-yellow-600 transition duration-300">
-                    <i class="fas fa-edit"></i> Edit
-                </a>
-                <a href="/book/${book._id}/delete" class="text-red-500 hover:text-red-600 transition duration-300">
-                    <i class="fas fa-trash-alt"></i> Delete
-                </a>
-            </div>
-        `;
+          <div class="flex items-start">
+              <!-- Book Cover Image or Placeholder -->
+              ${
+                book.cover_image_url
+                  ? `<img src="${book.cover_image_url}" alt="${book.name} Cover" class="w-24 h-32 object-cover rounded-lg shadow-md mr-6">`
+                  : `<div class="w-24 h-32 bg-gray-300 rounded-lg shadow-md mr-6 flex items-center justify-center text-gray-500">
+                          <i class="fas fa-book text-3xl"></i>
+                      </div>`
+              }
+              <div>
+                  <h2 class="text-lg font-semibold text-indigo-600 hover:underline mb-2">
+                      <a href="/book/${book._id}">${book.name}</a>
+                  </h2>
+                  <p class="text-sm text-gray-600 summary mb-4">${book.summary}</p>
+                  <p class="text-sm text-gray-500 mb-2"><i class="far fa-calendar-alt"></i> <strong>Published:</strong> ${book.date_of_publication}</p>
+                  <p class="text-sm text-gray-500"><i class="fas fa-chart-line"></i> <strong>Sales:</strong> ${book.number_of_sales}</p>
+              </div>
+          </div>
+          <div class="mt-4 flex justify-end space-x-4">
+              <a href="/book/${book._id}/edit" class="text-yellow-500 hover:text-yellow-600 transition duration-300">
+                  <i class="fas fa-edit"></i> Edit
+              </a>
+              <a href="/book/${book._id}/delete" class="text-red-500 hover:text-red-600 transition duration-300">
+                  <i class="fas fa-trash-alt"></i> Delete
+              </a>
+          </div>
+      `;
+
         container.appendChild(card);
     });
 

@@ -36,13 +36,30 @@
             </div>
             {% if books %}
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    {% for book in books %}
-                        <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300 border border-gray-200">
-                            <a href="{% url 'book_detail' book|get_id %}" class="text-2xl font-semibold text-blue-700 hover:underline">{{ book.name }}</a>
-                            <p class="text-gray-700 mt-2"><i class="fas fa-calendar-alt text-blue-600 mr-2"></i><strong class="text-blue-600">Date of Publication:</strong> {{ book.date_of_publication }}</p>
-                            <p class="text-gray-700 mt-4">{{ book.summary }}</p>
-                        </div>
-                    {% endfor %}
+                  {% for book in books %}
+                  <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300 border border-gray-200">
+                      <div class="flex items-start">
+                          <!-- Book Cover Image -->
+                          {% if book.cover_image_url %}
+                            <img src="{{ book.cover_image_url }}" alt="{{ book.name }} Cover" class="w-24 h-32 object-cover rounded-lg shadow-md mr-6">
+                          {% else %}
+                              <!-- Placeholder for missing cover image -->
+                              <div class="w-24 h-32 bg-gray-300 rounded-lg shadow-md mr-6 flex items-center justify-center text-gray-500">
+                                  <i class="fas fa-book text-3xl"></i>
+                              </div>
+                          {% endif %}
+                          <div>
+                              <!-- Book Title and Info -->
+                              <a href="{% url 'book_detail' book|get_id %}" class="text-2xl font-semibold text-blue-700 hover:underline">{{ book.name }}</a>
+                              <p class="text-gray-700 mt-2">
+                                  <i class="fas fa-calendar-alt text-blue-600 mr-2"></i><strong class="text-blue-600">Date of Publication:</strong> {{ book.date_of_publication }}
+                              </p>
+                              <p class="text-gray-700 mt-4">{{ book.summary }}</p>
+                          </div>
+                      </div>
+                  </div>
+              {% endfor %}
+              
                 </div>
             {% else %}
                 <p class="text-gray-700">No books available.</p>

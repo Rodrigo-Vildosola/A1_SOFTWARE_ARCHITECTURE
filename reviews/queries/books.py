@@ -155,6 +155,7 @@ def get_books_aggregate(page, name_filter=''):
                 "_id": "$books._id",
                 "name": { "$first": "$books.name" },
                 "summary": { "$first": "$books.summary" },
+                "cover_image_url": {"$first": "$books.cover_image_url" }, 
                 "date_of_publication": { "$first": "$books.date_of_publication" },
                 "author_id": { "$first": "$_id" },
                 "number_of_sales": { '$sum': { '$toInt': '$books.sales.sales' } }
@@ -189,7 +190,8 @@ def get_book_by_id(pk):
                 "summary": "$books.summary",
                 "date_of_publication": "$books.date_of_publication",
                 "author_id": "$_id",
-                "author_name": "$name"
+                "author_name": "$name",
+                "cover_image_url": "$books.cover_image_url"
             }
         }
     ]

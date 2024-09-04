@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from bson.objectid import ObjectId
-from reviews.utils import collection
+from reviews.utils import collection, handle_uploaded_file
 from reviews.queries.books import (
     get_top_rated_books,
     get_top_selling_books,
@@ -59,7 +59,7 @@ def book_data(request):
     name_filter = request.GET.get('name_filter', '')
 
     books = get_books_aggregate(page, name_filter)
-    
+
     # Convert ObjectId to string
     for book in books:
         book['_id'] = str(book['_id'])
@@ -103,10 +103,19 @@ def book_detail(request, pk):
 def book_create(request):
     if request.method == "POST":
         author_id = ObjectId(request.POST.get('author_id_hidden'))
+        
+        # Get the uploaded cover image
+        cover_image = request.FILES.get('cover_image')
+        cover_image_url = None
+        
+        if cover_image:
+            cover_image_url = handle_uploaded_file(cover_image)  # Save the image and return the URL
+        
         book = {
             "name": request.POST.get('name'),
             "summary": request.POST.get('summary'),
             "date_of_publication": request.POST.get('date_of_publication'),
+            "cover_image_url": cover_image_url,  # Add cover image URL
         }
         create_book(author_id, book)
         return redirect('book_list')
@@ -118,10 +127,19 @@ def book_create(request):
 def book_create_for_author(request, author_id):
     if request.method == "POST":
         author_id = ObjectId(author_id)
+                
+        # Get the uploaded cover image
+        cover_image = request.FILES.get('cover_image')
+        cover_image_url = None
+        
+        if cover_image:
+            cover_image_url = handle_uploaded_file(cover_image)  # Save the image and return the URL
+        
         book = {
             "name": request.POST.get('name'),
             "summary": request.POST.get('summary'),
             "date_of_publication": request.POST.get('date_of_publication'),
+            "cover_image_url": cover_image_url,  # Add cover image URL
         }
         create_book(author_id, book)
         return redirect('author_detail', pk=author_id)
@@ -132,11 +150,16 @@ def book_create_for_author(request, author_id):
 def book_edit(request, pk):
     book = get_book_by_id(pk)
     if request.method == "POST":
+        cover_image = request.FILES.get('cover_image')  # Get the uploaded cover image
+        cover_image_url = book.get('cover_image_url')  # Use existing image if no new one is uploaded
+        if cover_image:
+            cover_image_url = handle_uploaded_file(cover_image)  # Handle saving the image
         updated_book = {
             "name": request.POST.get('name'),
             "summary": request.POST.get('summary'),
             "date_of_publication": request.POST.get('date_of_publication'),
-            "author_id": ObjectId(request.POST.get('author_id'))
+            "cover_image_url": cover_image_url,  # Include updated or existing cover image URL
+            "author_id": ObjectId(request.POST.get('author_id_hidden'))
         }
         update_book(pk, updated_book)
         return redirect('book_list')

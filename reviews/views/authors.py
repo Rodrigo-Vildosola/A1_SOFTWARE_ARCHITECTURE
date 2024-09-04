@@ -67,6 +67,8 @@ def author_detail(request, pk):
     if not author:
         return HttpResponseNotFound("Author not found.")
     
+    print("Books: ", author.get("books", []))
+
     return render(request, 'authors/author_detail.html', {'author': author, 'books': author.get("books")})
 
 def author_create(request):

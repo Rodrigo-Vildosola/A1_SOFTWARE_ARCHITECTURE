@@ -9,7 +9,7 @@
         <i class="fas fa-book mr-2"></i>
         {% if book %}Edit Book{% else %}Add Book{% endif %}
     </h1>
-    <form method="post" class="space-y-6">
+    <form method="post" enctype="multipart/form-data" class="space-y-6">  <!-- Add enctype for file upload -->
         {% csrf_token %}
         <div class="space-y-2">
             <label for="name" class="block text-gray-700 flex items-center">
@@ -29,6 +29,7 @@
             </label>
             <input required type="text" id="date_of_publication" name="date_of_publication" value="{% if book %}{{ book.date_of_publication|format_date }}{% endif %}" class="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 datepicker">
         </div>
+
         {% if not author %}
         <div class="space-y-2">
             <label for="author_id" class="block text-gray-700 flex items-center">
@@ -43,8 +44,34 @@
             <input type="hidden" id="author_id_hidden" name="author_id_hidden" value="{% if book %}{{ book.author_id }}{% endif %}">
         </div>
         {% else %}
-        <input type="hidden" name="author_id" value="{{ author|get_id }}">
+          <input type="hidden" name="author_id" value="{{ author|get_id }}">
         {% endif %}
+
+        <div class="space-y-2">
+          <label for="cover_image" class="block text-gray-700 flex items-center">
+              <i class="fas fa-image mr-2"></i>Upload Cover Image
+          </label>
+
+          <div class="relative">
+              <label for="cover_image" class="cursor-pointer bg-gradient-to-r from-green-400 to-blue-500 text-white px-6 py-3 rounded-lg shadow-lg hover:from-green-500 hover:to-blue-600 transition duration-300 flex items-center justify-center">
+                  <i class="fas fa-upload mr-2"></i> Choose an Image
+              </label>
+              <input type="file" id="cover_image" name="cover_image" class="absolute inset-0 opacity-0 w-full h-full cursor-pointer">
+              
+              {% if book and book.cover_image_url %}
+                  <p class="mt-2 text-gray-500 text-sm">Currently uploaded: {{ book.cover_image_url }}</p>
+              {% endif %}
+          </div>
+        </div>
+
+        <div id="image-preview" class="mt-4">
+          {% if book and book.cover_image_url %}
+              <img id="existing-image" src="{{ book.cover_image_url }}" alt="{{ book.name }}" class="w-32 h-32 object-cover rounded-full mx-auto shadow-md">
+          {% else %}
+              <img id="preview" src="#" alt="Image Preview" class="w-32 h-32 object-cover rounded-full mx-auto shadow-md hidden">
+          {% endif %}
+        </div>
+
         <button type="submit" class="mt-4 bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-6 py-3 rounded-lg shadow-lg hover:from-blue-600 hover:to-indigo-600 transition duration-300 flex items-center">
           <i class="fas fa-save mr-2"></i> Save
         </button>
@@ -80,6 +107,27 @@
             textarea.style.height = 'auto';
             textarea.style.height = (textarea.scrollHeight) + 'px';
         });
+    });
+
+    // Handle image preview
+    document.getElementById('cover_image').addEventListener('change', function(event) {
+        const preview = document.getElementById('preview');
+        const existingImage = document.getElementById('existing-image');
+        const file = event.target.files[0];
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            if (existingImage) {
+                existingImage.src = e.target.result;
+            } else {
+                preview.src = e.target.result;
+                preview.classList.remove('hidden');
+            }
+        };
+
+        if (file) {
+            reader.readAsDataURL(file);
+        }
     });
 
     // Handle author selection from datalist
