@@ -37,3 +37,4 @@ networks:
 volumes:
   mongo_data:
   static_volume:
+  media_volume:
