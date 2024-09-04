@@ -22,35 +22,43 @@ def get_author_with_books_reviews_sales(page, sort_by, order, name_filter):
     pipeline = [
         {
             "$addFields": {
-                "number_of_books": { "$size": "$books" },
+                # Ensure books is an array or an empty array if missing
+                "books": { "$ifNull": ["$books", []] },
+                
+                # Calculate the number of books
+                "number_of_books": { "$size": { "$ifNull": ["$books", []] } },
+                
+                # Calculate the total sales (ensure books.sales is handled properly)
                 "total_sales": {
                     "$sum": {
                         "$map": {
-                            "input": "$books",
+                            "input": { "$ifNull": ["$books", []] },
                             "as": "book",
                             "in": {
                                 "$sum": {
                                     "$map": {
-                                        "input": "$$book.sales",
+                                        "input": { "$ifNull": ["$$book.sales", []] },
                                         "as": "sale",
-                                        "in": { "$toInt": "$$sale.sales" }
+                                        "in": { "$toInt": { "$ifNull": ["$$sale.sales", 0] } }
                                     }
                                 }
                             }
                         }
                     }
                 },
+                
+                # Calculate the average review score
                 "average_score": {
                     "$avg": {
                         "$map": {
-                            "input": "$books",
+                            "input": { "$ifNull": ["$books", []] },
                             "as": "book",
                             "in": {
                                 "$avg": {
                                     "$map": {
-                                        "input": "$$book.reviews",
+                                        "input": { "$ifNull": ["$$book.reviews", []] },
                                         "as": "review",
-                                        "in": { "$toDouble": "$$review.score" }
+                                        "in": { "$toDouble": { "$ifNull": ["$$review.score", 0] } }
                                     }
                                 }
                             }

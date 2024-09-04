@@ -8,7 +8,7 @@
     <h1 class="text-4xl font-bold mb-6 text-indigo-600 flex items-center">
         <i class="fas fa-user-edit mr-4"></i>{% if author %}Edit Author{% else %}Add Author{% endif %}
     </h1>
-    <form method="post" class="space-y-6">
+    <form method="post" enctype="multipart/form-data" class="space-y-6">
         {% csrf_token %}
         <div class="space-y-2">
             <label for="name" class="block text-gray-700 flex items-center"><i class="fas fa-signature mr-2"></i>Name</label>
@@ -26,6 +26,37 @@
             <label for="short_description" class="block text-gray-700 flex items-center"><i class="fas fa-info-circle mr-2"></i>Short Description</label>
             <textarea id="short_description" name="short_description" class="mt-1 p-2 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 auto-resize">{% if author %}{{ author.short_description }}{% endif %}</textarea>
         </div>
+
+        <!-- Image Upload Section -->
+        <div class="space-y-2">
+          <label for="image" class="block text-gray-700 flex items-center">
+              <i class="fas fa-image mr-2"></i>Upload Image
+          </label>
+
+          <div class="relative">
+              <!-- Custom File Input Trigger -->
+              <label for="image" class="cursor-pointer bg-gradient-to-r from-green-400 to-blue-500 text-white px-6 py-3 rounded-lg shadow-lg hover:from-green-500 hover:to-blue-600 transition duration-300 flex items-center justify-center">
+                  <i class="fas fa-upload mr-2"></i> Choose an Image
+              </label>
+              <input type="file" id="image" name="image" class="absolute inset-0 opacity-0 w-full h-full cursor-pointer">
+              
+              <!-- Display text indicating an existing image is already uploaded -->
+              {% if author and author.image_url %}
+                  <p class="mt-2 text-gray-500 text-sm">Currently uploaded: {{ author.image_url }}</p>
+              {% endif %}
+          </div>
+        </div>
+
+        <!-- Image Preview Section -->
+        <div id="image-preview" class="mt-4">
+          {% if author and author.image_url %}
+              <img id="existing-image" src="{{ author.image_url }}" alt="{{ author.name }}" class="w-32 h-32 object-cover rounded-full mx-auto shadow-md">
+          {% else %}
+              <img id="preview" src="#" alt="Image Preview" class="w-32 h-32 object-cover rounded-full mx-auto shadow-md hidden">
+          {% endif %}
+        </div>
+
+
         <button type="submit" class="mt-4 bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-6 py-3 rounded-lg shadow-lg hover:from-blue-600 hover:to-indigo-600 transition duration-300 flex items-center">
             <i class="fas fa-save mr-2"></i> Save
         </button>
@@ -61,6 +92,29 @@
             textarea.style.height = 'auto';
             textarea.style.height = (textarea.scrollHeight) + 'px';
         });
+    });
+
+    // Image Preview Functionality
+    document.getElementById('image').addEventListener('change', function(event) {
+        let preview = document.getElementById('preview');
+        let existingImage = document.getElementById('existing-image');
+        const file = event.target.files[0];
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            if (existingImage) {
+                // If there is an existing image, update its src
+                existingImage.src = e.target.result;
+            } else {
+                // If there's no existing image, use the preview element
+                preview.src = e.target.result;
+                preview.classList.remove('hidden');
+            }
+        };
+
+        if (file) {
+            reader.readAsDataURL(file);
+        }
     });
 </script>
 {% endblock %}

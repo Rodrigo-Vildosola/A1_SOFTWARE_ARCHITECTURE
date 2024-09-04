@@ -10,10 +10,18 @@ collection = db['object']
 
 
 def handle_uploaded_file(f):
-    upload_path = os.path.join(settings.MEDIA_ROOT, f.name)
+    # Ensure the media directory exists
+    media_dir = settings.MEDIA_ROOT
+    if not os.path.exists(media_dir):
+        os.makedirs(media_dir)
+
+    # Save the uploaded file
+    upload_path = os.path.join(media_dir, f.name)
+    print(upload_path)
     with open(upload_path, 'wb+') as destination:
         for chunk in f.chunks():
             destination.write(chunk)
+    print("Uploaded image: ", os.path.join(settings.MEDIA_URL, f.name))
     return os.path.join(settings.MEDIA_URL, f.name)  # Return the media URL to store in MongoDB
 
 

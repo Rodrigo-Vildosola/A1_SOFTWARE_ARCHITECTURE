@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  # MongoDB container for book review app data
+  mongodb:
+    image: mongo:4.4
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - bookreview_network
+
+  # Django app container
+  book-review-app:
+    build:
+      context: .
+    container_name: book-review-app
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code
+      - static_volume:/code/staticfiles
+      - media_volume:/code/media  # Mount media folder
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mongodb
+    networks:
+      - bookreview_network
+    env_file:
+      - .env
+
+  # Varnish reverse proxy
+  varnish:
+    image: varnish:6.6
+    container_name: varnish
+    ports:
+      - "8080:8080"
+    depends_on:
+      - book-review-app
+    networks:
+      - bookreview_network
+    volumes:
+      - ./varnish/default.vcl:/etc/varnish/default.vcl
+
+networks:
+  bookreview_network:
+
+volumes:
+  mongo_data:
+  static_volume:
+  media_volume:
