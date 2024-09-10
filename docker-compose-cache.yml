@@ -12,6 +12,15 @@ services:
     networks:
       - bookreview_network
 
+  # Redis container for caching
+  redis:
+    image: redis:6
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - bookreview_network
+
   # Django app container
   book-review-app:
     build:
@@ -22,24 +31,15 @@ services:
       - .:/code
       - static_volume:/code/staticfiles
       - media_volume:/code/media
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mongodb
+      - redis  
     networks:
       - bookreview_network
     env_file:
       - .env
-
-  # Varnish cache container
-  varnish:
-    image: varnish:stable
-    container_name: varnish
-    ports:
-      - "8080:8080"
-    depends_on:
-      - book-review-app
-    volumes:
-      - ./varnish/default.vcl:/etc/varnish/default.vcl
-    networks:
-      - bookreview_network
-    command: varnishd -F -a :8080 -f /etc/varnish/default.vcl -s malloc,256m
 
 networks:
   bookreview_network:

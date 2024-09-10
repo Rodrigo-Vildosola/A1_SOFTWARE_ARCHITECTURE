@@ -42,11 +42,8 @@ def get_author_with_books_reviews_sales(page, sort_by, order, name_filter):
     cache_key = generate_cache_key("author_with_books", page, sort_by, order, name_filter)
     cached_data = cache_get(cache_key)
     if cached_data:
-        print("CACHE HIT")
         return cached_data
     
-    print("CACHE MISS")
-
     sort_fields = {
         'name': 'name',
         'number_of_books': 'number_of_books',
@@ -139,11 +136,10 @@ def get_author_with_books_reviews_sales(page, sort_by, order, name_filter):
     result = (list(collection.aggregate(pipeline)), num_pages)
 
     # Cache the result
+    print(result)
     cache_set(cache_key, result)
 
     return result
-
-
 
 
 def create_author(author_data):

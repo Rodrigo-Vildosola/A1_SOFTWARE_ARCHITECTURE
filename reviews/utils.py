@@ -13,6 +13,13 @@ collection = db['object']
 
 CACHE_EXPIRATION = 600
 
+class JSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, ObjectId):
+            return str(obj)
+        return json.JSONEncoder.default(self, obj)
+
+
 def generate_cache_key(base_name, *args, **kwargs):
     """
     Generate a unique cache key using a base name, positional arguments, and keyword arguments.
@@ -34,7 +41,7 @@ def generate_cache_key(base_name, *args, **kwargs):
 
 def cache_set(key, data, expiration=CACHE_EXPIRATION):
     """Helper function to set cache with a serialized value."""
-    redis_client.setex(key, expiration, json.dumps(data))
+    redis_client.setex(key, expiration, json.dumps(data, cls=JSONEncoder))
 
 
 def cache_get(key):
