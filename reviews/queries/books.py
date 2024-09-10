@@ -246,6 +246,7 @@ def get_sales_by_book(pk):
 
 def create_book(author_id, book_data):
     book_data["_id"] = ObjectId()
+    
     return collection.update_one(
         {'_id': ObjectId(author_id)},
         {'$push': {'books': book_data}}

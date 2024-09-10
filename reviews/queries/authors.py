@@ -136,7 +136,6 @@ def get_author_with_books_reviews_sales(page, sort_by, order, name_filter):
     result = (list(collection.aggregate(pipeline)), num_pages)
 
     # Cache the result
-    print(result)
     cache_set(cache_key, result)
 
     return result
