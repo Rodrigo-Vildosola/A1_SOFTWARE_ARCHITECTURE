@@ -1,6 +1,6 @@
 
 from bson.objectid import ObjectId
-from reviews.utils import collection, generate_cache_key
+from reviews.utils import collection, generate_cache_key, cache_set, cache_get
 from reviews.redis import redis_client  
 
 
@@ -39,15 +39,14 @@ def get_author_by_id(pk, include_books=False):
 
 
 def get_author_with_books_reviews_sales(page, sort_by, order, name_filter):
-    cache_key = generate_cache_key(page, sort_by, order, name_filter)
-    
-    # Try to fetch from Redis cache
-    cached_data = redis_client.get(cache_key)
+    cache_key = generate_cache_key("author_with_books", page, sort_by, order, name_filter)
+    cached_data = cache_get(cache_key)
     if cached_data:
-        print("Cache HIT")
+        print("CACHE HIT")
         return cached_data
     
-    # If not cached, fetch from MongoDB
+    print("CACHE MISS")
+
     sort_fields = {
         'name': 'name',
         'number_of_books': 'number_of_books',
@@ -137,12 +136,13 @@ def get_author_with_books_reviews_sales(page, sort_by, order, name_filter):
     total_count = total_count_result[0]['total'] if total_count_result else 0
     num_pages = (total_count + 9) // 10
 
-    result = list(collection.aggregate(pipeline)), num_pages
+    result = (list(collection.aggregate(pipeline)), num_pages)
 
-    # Cache the result for 10 minutes
-    redis_client.setex(cache_key, 600, result)
+    # Cache the result
+    cache_set(cache_key, result)
 
     return result
+
 
 
 
