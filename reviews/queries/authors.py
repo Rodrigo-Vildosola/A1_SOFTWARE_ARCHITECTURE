@@ -146,7 +146,7 @@ def create_author(author_data):
     """Create an author and invalidate cache related to author listings."""
     try:
         collection.insert_one(author_data)
-        redis_client.flushdb()  # Invalidate all cache related to author listings
+        redis_client.flushdb()
         return True
     except Exception as e:
         print(f"An error occurred while creating the author: {e}")
@@ -157,7 +157,7 @@ def update_author(pk, updated_author):
     """Update an author by ID and invalidate relevant cache."""
     try:
         collection.update_one({'_id': ObjectId(pk)}, {'$set': updated_author})
-        redis_client.flushdb()  # Invalidate all cache related to author listings
+        redis_client.flushdb()
         return True
     except Exception as e:
         print(f"An error occurred while updating the author: {e}")
@@ -168,7 +168,7 @@ def delete_author(pk):
     """Delete an author by ID and invalidate relevant cache."""
     try:
         collection.delete_one({'_id': ObjectId(pk)})
-        redis_client.flushdb()  # Invalidate all cache related to author listings
+        redis_client.flushdb()
         return True
     except Exception as e:
         print(f"An error occurred while deleting the author: {e}")
