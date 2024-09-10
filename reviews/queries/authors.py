@@ -1,6 +1,7 @@
 
 from bson.objectid import ObjectId
-from reviews.utils import collection
+from reviews.utils import collection, generate_cache_key
+from reviews.redis import redis_client  
 
 
 def get_books_by_author(author_id):
@@ -8,8 +9,45 @@ def get_books_by_author(author_id):
     return author.get("books", []) if author else []
 
 
+def get_author_by_id(pk, include_books=False):
+    try:
+        match_stage = {"$match": {"_id": ObjectId(pk)}}
+        project_stage = {
+            "$project": {
+                "_id": 1,
+                "name": 1,
+                "date_of_birth": 1,
+                "country_of_origin": 1,
+                "short_description": 1,
+                "image_url": 1,
+                "books": {"$cond": {"if": include_books, "then": "$books", "else": "$$REMOVE"}}
+            }
+        }
+
+        pipeline = [match_stage, project_stage]
+
+        author = collection.aggregate(pipeline).next()
+        if not author:
+            return None
+        
+        return author
+    except StopIteration:
+        return None
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return None
+
 
 def get_author_with_books_reviews_sales(page, sort_by, order, name_filter):
+    cache_key = generate_cache_key(page, sort_by, order, name_filter)
+    
+    # Try to fetch from Redis cache
+    cached_data = redis_client.get(cache_key)
+    if cached_data:
+        print("Cache HIT")
+        return cached_data
+    
+    # If not cached, fetch from MongoDB
     sort_fields = {
         'name': 'name',
         'number_of_books': 'number_of_books',
@@ -22,13 +60,8 @@ def get_author_with_books_reviews_sales(page, sort_by, order, name_filter):
     pipeline = [
         {
             "$addFields": {
-                # Ensure books is an array or an empty array if missing
                 "books": { "$ifNull": ["$books", []] },
-                
-                # Calculate the number of books
                 "number_of_books": { "$size": { "$ifNull": ["$books", []] } },
-                
-                # Calculate the total sales (ensure books.sales is handled properly)
                 "total_sales": {
                     "$sum": {
                         "$map": {
@@ -46,8 +79,6 @@ def get_author_with_books_reviews_sales(page, sort_by, order, name_filter):
                         }
                     }
                 },
-                
-                # Calculate the average review score
                 "average_score": {
                     "$avg": {
                         "$map": {
@@ -106,4 +137,43 @@ def get_author_with_books_reviews_sales(page, sort_by, order, name_filter):
     total_count = total_count_result[0]['total'] if total_count_result else 0
     num_pages = (total_count + 9) // 10
 
-    return list(collection.aggregate(pipeline)), num_pages
+    result = list(collection.aggregate(pipeline)), num_pages
+
+    # Cache the result for 10 minutes
+    redis_client.setex(cache_key, 600, result)
+
+    return result
+
+
+
+def create_author(author_data):
+    """Create an author and invalidate cache related to author listings."""
+    try:
+        collection.insert_one(author_data)
+        redis_client.flushdb()  # Invalidate all cache related to author listings
+        return True
+    except Exception as e:
+        print(f"An error occurred while creating the author: {e}")
+        return False
+
+
+def update_author(pk, updated_author):
+    """Update an author by ID and invalidate relevant cache."""
+    try:
+        collection.update_one({'_id': ObjectId(pk)}, {'$set': updated_author})
+        redis_client.flushdb()  # Invalidate all cache related to author listings
+        return True
+    except Exception as e:
+        print(f"An error occurred while updating the author: {e}")
+        return False
+
+
+def delete_author(pk):
+    """Delete an author by ID and invalidate relevant cache."""
+    try:
+        collection.delete_one({'_id': ObjectId(pk)})
+        redis_client.flushdb()  # Invalidate all cache related to author listings
+        return True
+    except Exception as e:
+        print(f"An error occurred while deleting the author: {e}")
+        return False
