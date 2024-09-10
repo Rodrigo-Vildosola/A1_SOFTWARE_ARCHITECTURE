@@ -3,7 +3,7 @@
 ## Primero se debe crear un archivo .env con el siguiente contenido:
 
 ```bash
-SECRET_KEY=django-insecure-j9yu*wpfnh%iluyvv2pahkp-@4%(2f!)upm4z-#b$0#p2p2i$k
+SECRET_KEY=django-insecure-j9yu*wpfnh%iluyvv2pahkp-@4%(2f!)upm4z-#b$0#p2p2i$
 DEBUG=True
 DB_NAME=bookreview_db
 DB_USER=sagarcia4
