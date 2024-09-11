@@ -8,7 +8,7 @@ class RedisClient:
         if cls._instance is None:
             cls._instance = super(RedisClient, cls).__new__(cls)
             cls._instance.client = redis.StrictRedis(
-                host=config('REDIS_HOST', default='localhost'),
+                host=config('REDIS_HOST', default='redis'),
                 port=config('REDIS_PORT', default=6379),
                 db=config('REDIS_DB', default=0),
                 decode_responses=True

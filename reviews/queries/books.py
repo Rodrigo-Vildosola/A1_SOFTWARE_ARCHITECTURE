@@ -1,9 +1,18 @@
 from bson.objectid import ObjectId
 from pymongo.errors import PyMongoError
-from reviews.utils import collection
+from reviews.utils import collection, generate_cache_key, cache_set, cache_get
+from reviews.redis import redis_client
 
 
 def get_top_rated_books():
+    cache_key = generate_cache_key("top_rated_books")
+    cached_data = cache_get(cache_key)
+
+    # Intentar obtener los datos desde Redis
+    cached_data = cache_get(cache_key)
+    if cached_data:
+        print("Returning cached data: top 10 rated books")
+        return cached_data
     try:
         pipeline = [
             {"$unwind": "$books"},
@@ -63,13 +72,15 @@ def get_top_rated_books():
                         "score": "$highest_rated_review.score"
                     },
                     "lowest_rated_review": {
-                         "_id": "$lowest_rated_review._id",
+                            "_id": "$lowest_rated_review._id",
                         "review": "$lowest_rated_review.review",
                         "score": "$lowest_rated_review.score"
                     }
                 }
             }
         ]
+        books = list(collection.aggregate(pipeline))
+        cache_set(cache_key, books)
         return list(collection.aggregate(pipeline))
     except PyMongoError as e:
         print(f"An error occurred: {e}")
@@ -77,6 +88,12 @@ def get_top_rated_books():
 
 
 def get_top_selling_books(page=1, name_filter=''):
+    cache_key = generate_cache_key("top_selling_books", page, name_filter)
+    cached_data = cache_get(cache_key)
+    if cached_data:
+        print(f'Returning cached data: Top 50 selling books page {page}')
+        return cached_data
+
     try:
         pipeline = [
             {"$unwind": "$books"},
@@ -125,13 +142,11 @@ def get_top_selling_books(page=1, name_filter=''):
 
         total_books_count = len(books)  
         paginated_books = books[(page - 1) * 10: page * 10]  
-
+        cache_set(cache_key, (paginated_books, total_books_count))
         return paginated_books, total_books_count
     except PyMongoError as e:
         print(f"An error occurred: {e}")
         return [], 0
-
-
 
 
 def get_books_aggregate(page, name_filter=''):
@@ -172,7 +187,6 @@ def get_books_aggregate(page, name_filter=''):
         }
     ]
     return list(collection.aggregate(pipeline))
-
 
 
 def get_book_by_id(pk):
@@ -246,20 +260,37 @@ def get_sales_by_book(pk):
 
 def create_book(author_id, book_data):
     book_data["_id"] = ObjectId()
-    
-    return collection.update_one(
-        {'_id': ObjectId(author_id)},
-        {'$push': {'books': book_data}}
-    )
+    try:
+        result = collection.update_one(
+            {'_id': ObjectId(author_id)},
+            {'$push': {'books': book_data}}
+        )
+        redis_client.flushdb()
+        return result
+    except Exception as e:
+        print(f"An error occurred while creating the book: {e}")
+        return None
 
 def update_book(pk, data):
-    return collection.update_one(
-        {'books._id': ObjectId(pk)},
-        {'$set': {f'books.$.{key}': value for key, value in data.items()}}
-    )
+    try:
+        result = collection.update_one(
+            {'books._id': ObjectId(pk)},
+            {'$set': {f'books.$.{key}': value for key, value in data.items()}}
+        )
+        redis_client.flushdb()
+        return result
+    except Exception as e:
+        print(f"An error occurred while updating the book: {e}")
+        return None
 
 def delete_book(pk):
-    return collection.update_one(
-        {'books._id': ObjectId(pk)},
-        {'$pull': {'books': {'_id': ObjectId(pk)}}}
-    )
+    try:
+        result = collection.update_one(
+            {'books._id': ObjectId(pk)},
+            {'$pull': {'books': {'_id': ObjectId(pk)}}}
+        )
+        redis_client.flushdb()
+        return result
+    except Exception as e:
+        print(f"An error occurred while deleting the book: {e}")
+        return None
