@@ -11,7 +11,7 @@ def get_top_rated_books():
     # Intentar obtener los datos desde Redis
     cached_data = cache_get(cache_key)
     if cached_data:
-        print("Returning cached data: top 10 rated books")
+        print("----------------- Returning cached data: top 10 rated books -----------------")
         return cached_data
     try:
         pipeline = [
@@ -91,7 +91,7 @@ def get_top_selling_books(page=1, name_filter=''):
     cache_key = generate_cache_key("top_selling_books", page, name_filter)
     cached_data = cache_get(cache_key)
     if cached_data:
-        print(f'Returning cached data: Top 50 selling books page {page}')
+        print(f'----------------- Returning cached data: Top 50 selling books page {page} -----------------')
         return cached_data
 
     try:

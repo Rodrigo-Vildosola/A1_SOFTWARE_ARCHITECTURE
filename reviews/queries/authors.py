@@ -42,6 +42,7 @@ def get_author_with_books_reviews_sales(page, sort_by, order, name_filter):
     cache_key = generate_cache_key("author_with_books", page, sort_by, order, name_filter)
     cached_data = cache_get(cache_key)
     if cached_data:
+        print(f'----------------- Returning cached data: authors page {page} -----------------')
         return cached_data
     
     sort_fields = {

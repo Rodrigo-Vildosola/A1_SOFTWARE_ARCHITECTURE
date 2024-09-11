@@ -1,9 +1,16 @@
 from bson.objectid import ObjectId
 from pymongo.errors import PyMongoError
-from reviews.utils import collection
+from reviews.utils import collection, generate_cache_key, cache_set, cache_get
+from reviews.redis import redis_client  
 
 
 def get_all_reviews(page=1, name_filter=''):
+    cache_key = generate_cache_key("reviews", page, name_filter)
+    cached_data = cache_get(cache_key)
+    if cached_data:
+        print(f'----------------- Returning cached data: reviews page {page} -----------------')
+        return cached_data
+    
     try:
         pipeline = [
             {"$unwind": "$books"},
@@ -49,6 +56,7 @@ def get_all_reviews(page=1, name_filter=''):
         reviews = list(collection.aggregate(pipeline))
         
         total_reviews_count = next(collection.aggregate(total_reviews_pipeline), {}).get('total', 0)
+        cache_set(cache_key, (reviews, total_reviews_count))
         return reviews, total_reviews_count
     except PyMongoError as e:
         print(f"An error occurred: {e}")
@@ -56,6 +64,12 @@ def get_all_reviews(page=1, name_filter=''):
   
 
 def get_review_by_id(review_id):
+    cache_key = generate_cache_key("reviews", review_id)
+    cached_data = cache_get(cache_key)
+    if cached_data:
+        print(f'----------------- Returning cached data: review {review_id} -----------------')
+        return cached_data
+    
     try:
         review_id = ObjectId(review_id)
         pipeline = [
@@ -74,6 +88,7 @@ def get_review_by_id(review_id):
             }
         ]
         result = list(collection.aggregate(pipeline))
+        cache_set(cache_key, result[0] if result else "Review not found")
         return result[0] if result else "Review not found"
     except PyMongoError as e:
         print(f"An error occurred: {e}")
